@@ -54,22 +54,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const signOut = async () => {
         try {
-            // First clear local storage
-            localStorage.removeItem('sb-' + supabase.supabaseUrl + '-auth-token');
+            // Clear all Supabase-related items from localStorage
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key?.startsWith('sb-')) {
+                    localStorage.removeItem(key);
+                }
+            }
             
-            // Then attempt to sign out from Supabase
+            // Sign out from Supabase
             const { error } = await supabase.auth.signOut();
             if (error && error.message !== 'Auth session missing!') {
                 console.error('Error signing out:', error.message);
                 throw error;
             }
 
-            // Always clear the user state, even if there's an auth session missing error
+            // Clear user state
             setUser(null);
+
+            // Clear any session cookies
+            document.cookie.split(";").forEach(function(c) { 
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+            });
+
+            // Force a page reload to clear any cached state
+            window.location.href = '/';
         } catch (error) {
             console.error('Error during sign out:', error);
-            // Still clear the user state
+            // Still clear the user state and reload
             setUser(null);
+            window.location.href = '/';
         }
     };
 
