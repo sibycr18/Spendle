@@ -1,175 +1,409 @@
 import { useState } from 'react';
 import { format, startOfMonth } from 'date-fns';
 import { Category, Income, Expense, MonthData } from '../types';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, DollarSign, X, Calendar } from 'lucide-react';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "../styles/datepicker.css";
+
+interface IncomeSource {
+    id: number;
+    name: string;
+    amount: number;
+}
+
+interface Expense {
+    id: number;
+    category: 'investment' | 'debt' | 'needs' | 'leisure';
+    name: string;
+    amount: number;
+}
 
 const CATEGORIES: Category[] = ['investment', 'debt', 'needs', 'leisure'];
 
 export default function Dashboard() {
-    const [selectedDate, setSelectedDate] = useState(startOfMonth(new Date()));
-    const [monthData, setMonthData] = useState<MonthData>({
-        month: selectedDate,
-        incomes: [{ source: 'Salary', amount: 0 }],
-        expenses: []
+    const [selectedMonth, setSelectedMonth] = useState(startOfMonth(new Date()));
+    const [incomeSources, setIncomeSources] = useState<IncomeSource[]>([]);
+    const [expenses, setExpenses] = useState<Expense[]>([]);
+    const [newIncomeSource, setNewIncomeSource] = useState({ name: '', amount: '' });
+    const [newExpense, setNewExpense] = useState({
+        category: 'needs' as const,
+        name: '',
+        amount: ''
     });
+    const [isAddingExpense, setIsAddingExpense] = useState(false);
+    const [isAddingIncomeSource, setIsAddingIncomeSource] = useState(false);
 
-    const addIncome = () => {
-        setMonthData(prev => ({
-            ...prev,
-            incomes: [...prev.incomes, { source: '', amount: 0 }]
-        }));
+    const handleAddIncomeSource = () => {
+        if (newIncomeSource.name && newIncomeSource.amount) {
+            setIncomeSources([
+                ...incomeSources,
+                {
+                    id: Date.now(),
+                    name: newIncomeSource.name,
+                    amount: parseFloat(newIncomeSource.amount),
+                },
+            ]);
+            setNewIncomeSource({ name: '', amount: '' });
+        }
     };
 
-    const updateIncome = (index: number, field: keyof Income, value: string | number) => {
-        setMonthData(prev => ({
-            ...prev,
-            incomes: prev.incomes.map((income, i) => 
-                i === index ? { ...income, [field]: value } : income
-            )
-        }));
+    const handleAddExpense = () => {
+        if (newExpense.name && newExpense.amount && newExpense.category) {
+            setExpenses([
+                ...expenses,
+                {
+                    id: Date.now(),
+                    category: newExpense.category,
+                    name: newExpense.name,
+                    amount: parseFloat(newExpense.amount),
+                },
+            ]);
+            setNewExpense({ category: 'needs', name: '', amount: '' });
+            setIsAddingExpense(false);
+        }
     };
 
-    const addExpense = (category: Category) => {
-        const newExpense: Expense = {
-            id: crypto.randomUUID(),
-            name: '',
-            amount: 0,
-            category,
-            date: selectedDate
-        };
-        setMonthData(prev => ({
-            ...prev,
-            expenses: [...prev.expenses, newExpense]
-        }));
+    const handleRemoveIncomeSource = (id: number) => {
+        setIncomeSources(incomeSources.filter((source) => source.id !== id));
     };
 
-    const updateExpense = (id: string, field: keyof Expense, value: string | number) => {
-        setMonthData(prev => ({
-            ...prev,
-            expenses: prev.expenses.map(expense => 
-                expense.id === id ? { ...expense, [field]: value } : expense
-            )
-        }));
+    const handleRemoveExpense = (id: number) => {
+        setExpenses(expenses.filter((expense) => expense.id !== id));
     };
 
-    const deleteExpense = (id: string) => {
-        setMonthData(prev => ({
-            ...prev,
-            expenses: prev.expenses.filter(expense => expense.id !== id)
-        }));
-    };
+    const totalIncome = incomeSources.reduce((sum, source) => sum + source.amount, 0);
 
-    const totalIncome = monthData.incomes.reduce((sum, income) => sum + income.amount, 0);
-    const totalExpenses = monthData.expenses.reduce((sum, expense) => sum + expense.amount, 0);
-    const remaining = totalIncome - totalExpenses;
+    const expensesByCategory = CATEGORIES.reduce((acc, category) => {
+        acc[category] = expenses
+            .filter((e) => e.category === category)
+            .reduce((sum, e) => sum + e.amount, 0);
+        return acc;
+    }, {} as Record<typeof CATEGORIES[number], number>);
+
+    const totalExpenses = Object.values(expensesByCategory).reduce(
+        (sum, amount) => sum + amount,
+        0
+    );
 
     return (
-        <div className="container mx-auto p-4 max-w-6xl">
-            <div className="mb-8">
-                <input
-                    type="month"
-                    value={format(selectedDate, 'yyyy-MM')}
-                    onChange={(e) => setSelectedDate(startOfMonth(new Date(e.target.value)))}
-                    className="border rounded p-2"
-                />
-            </div>
-
-            {/* Income Section */}
-            <div className="mb-8 bg-white p-4 rounded-lg shadow">
-                <h2 className="text-xl font-bold mb-4">Income Sources</h2>
-                {monthData.incomes.map((income, index) => (
-                    <div key={index} className="flex gap-4 mb-2">
-                        <input
-                            type="text"
-                            value={income.source}
-                            onChange={(e) => updateIncome(index, 'source', e.target.value)}
-                            placeholder="Source"
-                            className="border rounded p-2 flex-1"
-                        />
-                        <input
-                            type="number"
-                            value={income.amount}
-                            onChange={(e) => updateIncome(index, 'amount', parseFloat(e.target.value) || 0)}
-                            placeholder="Amount"
-                            className="border rounded p-2 w-32"
-                        />
-                    </div>
-                ))}
-                <button
-                    onClick={addIncome}
-                    className="mt-2 flex items-center gap-2 text-blue-600 hover:text-blue-800"
-                >
-                    <Plus size={16} /> Add Income Source
-                </button>
-            </div>
-
-            {/* Categories Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {CATEGORIES.map(category => (
-                    <div key={category} className="bg-white p-4 rounded-lg shadow">
-                        <h2 className="text-xl font-bold mb-4 capitalize">{category}</h2>
-                        {monthData.expenses
-                            .filter(expense => expense.category === category)
-                            .map(expense => (
-                                <div key={expense.id} className="flex gap-4 mb-2">
-                                    <input
-                                        type="text"
-                                        value={expense.name}
-                                        onChange={(e) => updateExpense(expense.id, 'name', e.target.value)}
-                                        placeholder="Expense name"
-                                        className="border rounded p-2 flex-1"
-                                    />
-                                    <input
-                                        type="number"
-                                        value={expense.amount}
-                                        onChange={(e) => updateExpense(expense.id, 'amount', parseFloat(e.target.value) || 0)}
-                                        placeholder="Amount"
-                                        className="border rounded p-2 w-32"
-                                    />
-                                    <button
-                                        onClick={() => deleteExpense(expense.id)}
-                                        className="text-red-600 hover:text-red-800"
-                                    >
-                                        <Trash2 size={20} />
-                                    </button>
-                                </div>
-                            ))}
-                        <button
-                            onClick={() => addExpense(category)}
-                            className="mt-2 flex items-center gap-2 text-blue-600 hover:text-blue-800"
-                        >
-                            <Plus size={16} /> Add Expense
-                        </button>
-                        <div className="mt-4 text-right">
-                            <p className="text-gray-600">
-                                Total: ₹{monthData.expenses
-                                    .filter(expense => expense.category === category)
-                                    .reduce((sum, expense) => sum + expense.amount, 0)
-                                    .toLocaleString()}
-                            </p>
-                        </div>
-                    </div>
-                ))}
+        <div className="space-y-8 max-w-7xl mx-auto px-4 py-6">
+            {/* Header */}
+            <div className="flex justify-between items-center">
+                <div>
+                    <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Dashboard</h1>
+                    <p className="text-gray-700 mt-1">
+                        {format(selectedMonth, 'MMMM yyyy')}
+                    </p>
+                </div>
+                <div className="relative">
+                    <DatePicker
+                        key={selectedMonth.getTime()}
+                        selected={selectedMonth}
+                        onChange={(date: Date) => setSelectedMonth(startOfMonth(date))}
+                        dateFormat="MMMM yyyy"
+                        showMonthYearPicker
+                        showFullMonthYearPicker
+                        showTwoColumnMonthYearPicker
+                        customInput={
+                            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-gray-700">
+                                <Calendar className="h-5 w-5" />
+                                <span className="font-medium">{format(selectedMonth, 'MMMM yyyy')}</span>
+                            </button>
+                        }
+                        calendarClassName="bg-white border border-gray-200 rounded-lg shadow-lg"
+                        wrapperClassName="!block"
+                        popperClassName="!z-50"
+                        popperPlacement="bottom-end"
+                        popperModifiers={[
+                            {
+                                name: "offset",
+                                options: {
+                                    offset: [0, 8]
+                                }
+                            }
+                        ]}
+                        renderCustomHeader={({
+                            date,
+                            decreaseYear,
+                            increaseYear,
+                            prevMonthButtonDisabled,
+                            nextMonthButtonDisabled
+                        }) => (
+                            <div className="flex justify-between items-center mb-2 px-2">
+                                <button
+                                    onClick={decreaseYear}
+                                    disabled={prevMonthButtonDisabled}
+                                    type="button"
+                                    className="p-1 hover:bg-gray-100 rounded-full disabled:opacity-50"
+                                >
+                                    <span className="text-gray-600">←</span>
+                                </button>
+                                <h2 className="text-sm font-medium text-gray-900">
+                                    {format(date, 'yyyy')}
+                                </h2>
+                                <button
+                                    onClick={increaseYear}
+                                    disabled={nextMonthButtonDisabled}
+                                    type="button"
+                                    className="p-1 hover:bg-gray-100 rounded-full disabled:opacity-50"
+                                >
+                                    <span className="text-gray-600">→</span>
+                                </button>
+                            </div>
+                        )}
+                        children={
+                            <div className="datepicker-footer">
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        const currentMonth = startOfMonth(new Date());
+                                        setSelectedMonth(currentMonth);
+                                    }}
+                                    type="button"
+                                    className="current-month-button"
+                                >
+                                    Current Month
+                                </button>
+                            </div>
+                        }
+                    />
+                </div>
             </div>
 
             {/* Summary Section */}
-            <div className="mt-8 bg-white p-4 rounded-lg shadow">
-                <h2 className="text-xl font-bold mb-4">Summary</h2>
-                <div className="grid grid-cols-3 gap-4">
-                    <div>
-                        <p className="text-gray-600">Total Income</p>
-                        <p className="text-2xl font-bold text-green-600">₹{totalIncome.toLocaleString()}</p>
+            <div className="bg-white rounded-lg shadow-md border border-gray-300 p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Summary</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-blue-100 rounded-lg p-4 shadow-sm">
+                        <div className="text-sm text-blue-700 font-medium">Total Income</div>
+                        <div className="text-2xl font-bold text-blue-800">
+                            ₹{totalIncome.toFixed(2)}
+                        </div>
                     </div>
-                    <div>
-                        <p className="text-gray-600">Total Expenses</p>
-                        <p className="text-2xl font-bold text-red-600">₹{totalExpenses.toLocaleString()}</p>
+                    <div className="bg-red-100 rounded-lg p-4 shadow-sm">
+                        <div className="text-sm text-red-700 font-medium">Total Expenses</div>
+                        <div className="text-2xl font-bold text-red-800">
+                            ₹{totalExpenses.toFixed(2)}
+                        </div>
                     </div>
-                    <div>
-                        <p className="text-gray-600">Remaining</p>
-                        <p className={`text-2xl font-bold ${remaining >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            ₹{remaining.toLocaleString()}
-                        </p>
+                    <div className="bg-green-100 rounded-lg p-4 shadow-sm">
+                        <div className="text-sm text-green-700 font-medium">
+                            Remaining Balance
+                        </div>
+                        <div className="text-2xl font-bold text-green-800">
+                            ₹{(totalIncome - totalExpenses).toFixed(2)}
+                        </div>
                     </div>
+                </div>
+            </div>
+
+            {/* Income Sources */}
+            <div className="max-w-2xl mx-auto w-full">
+                <div className="bg-white rounded-lg shadow-md border border-gray-300 p-6">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-lg font-semibold text-gray-900">Income Sources</h2>
+                        <button
+                            onClick={() => setIsAddingIncomeSource(!isAddingIncomeSource)}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2 shadow-sm"
+                        >
+                            {isAddingIncomeSource ? (
+                                <>
+                                    <X className="h-5 w-5" />
+                                    <span>Cancel</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Plus className="h-5 w-5" />
+                                    <span>Add</span>
+                                </>
+                            )}
+                        </button>
+                    </div>
+
+                    {/* Add Income Form */}
+                    {isAddingIncomeSource && (
+                        <div className="flex flex-col md:flex-row gap-4 p-4 bg-gray-100 rounded-lg mb-6 shadow-sm">
+                            <div className="flex-1">
+                                <input
+                                    type="text"
+                                    placeholder="Source name"
+                                    value={newIncomeSource.name}
+                                    onChange={(e) =>
+                                        setNewIncomeSource({ ...newIncomeSource, name: e.target.value })
+                                    }
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm"
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <DollarSign className="h-5 w-5 text-gray-500" />
+                                    </div>
+                                    <input
+                                        type="number"
+                                        placeholder="Amount"
+                                        value={newIncomeSource.amount}
+                                        onChange={(e) =>
+                                            setNewIncomeSource({
+                                                ...newIncomeSource,
+                                                amount: e.target.value,
+                                            })
+                                        }
+                                        className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm"
+                                    />
+                                </div>
+                            </div>
+                            <button
+                                onClick={handleAddIncomeSource}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2 shadow-sm"
+                            >
+                                <Plus className="h-5 w-5" />
+                                <span>Save</span>
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Income Sources List */}
+                    <div className="space-y-3">
+                        {incomeSources.map((source) => (
+                            <div
+                                key={source.id}
+                                className="flex items-center justify-between bg-gray-100 p-4 rounded-md shadow-sm border border-gray-200"
+                            >
+                                <span className="font-medium text-gray-900">{source.name}</span>
+                                <div className="flex items-center gap-4">
+                                    <span className="text-gray-900 font-medium">₹{source.amount.toFixed(2)}</span>
+                                    <button
+                                        onClick={() => handleRemoveIncomeSource(source.id)}
+                                        className="text-red-600 hover:text-red-800 focus:outline-none"
+                                    >
+                                        <Trash2 className="h-5 w-5" />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Expenses */}
+            <div className="bg-white rounded-lg shadow-md border border-gray-300 p-6">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-semibold text-gray-900">Expenses</h2>
+                    <button
+                        onClick={() => setIsAddingExpense(!isAddingExpense)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2 shadow-sm"
+                    >
+                        {isAddingExpense ? (
+                            <>
+                                <X className="h-5 w-5" />
+                                <span>Cancel</span>
+                            </>
+                        ) : (
+                            <>
+                                <Plus className="h-5 w-5" />
+                                <span>Add</span>
+                            </>
+                        )}
+                    </button>
+                </div>
+
+                {/* Add Expense Form */}
+                {isAddingExpense && (
+                    <div className="flex flex-col md:flex-row gap-4 p-4 bg-gray-100 rounded-lg mb-6 shadow-sm">
+                        <div className="flex-1">
+                            <select
+                                value={newExpense.category}
+                                onChange={(e) =>
+                                    setNewExpense({
+                                        ...newExpense,
+                                        category: e.target.value as typeof CATEGORIES[number],
+                                    })
+                                }
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm"
+                            >
+                                {CATEGORIES.map((category) => (
+                                    <option key={category} value={category}>
+                                        {category.charAt(0).toUpperCase() + category.slice(1)}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="flex-1">
+                            <input
+                                type="text"
+                                placeholder="Expense name"
+                                value={newExpense.name}
+                                onChange={(e) =>
+                                    setNewExpense({ ...newExpense, name: e.target.value })
+                                }
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm"
+                            />
+                        </div>
+                        <div className="flex-1">
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <DollarSign className="h-5 w-5 text-gray-500" />
+                                </div>
+                                <input
+                                    type="number"
+                                    placeholder="Amount"
+                                    value={newExpense.amount}
+                                    onChange={(e) =>
+                                        setNewExpense({ ...newExpense, amount: e.target.value })
+                                    }
+                                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm"
+                                />
+                            </div>
+                        </div>
+                        <button
+                            onClick={handleAddExpense}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2 shadow-sm"
+                        >
+                            <Plus className="h-5 w-5" />
+                            <span>Save</span>
+                        </button>
+                    </div>
+                )}
+
+                {/* Categories */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {CATEGORIES.map((category) => (
+                        <div key={category} className="bg-gray-100 rounded-lg p-4 shadow-sm border border-gray-200">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="font-medium text-gray-900 capitalize">{category}</h3>
+                                <span className="text-sm font-medium text-gray-700">
+                                    Total: ₹{expensesByCategory[category].toFixed(2)}
+                                </span>
+                            </div>
+                            <div className="space-y-3">
+                                {expenses
+                                    .filter((expense) => expense.category === category)
+                                    .map((expense) => (
+                                        <div
+                                            key={expense.id}
+                                            className="flex items-center justify-between bg-white p-4 rounded-md shadow-sm border border-gray-200"
+                                        >
+                                            <span className="font-medium text-gray-900">
+                                                {expense.name}
+                                            </span>
+                                            <div className="flex items-center gap-4">
+                                                <span className="text-gray-900 font-medium">
+                                                    ₹{expense.amount.toFixed(2)}
+                                                </span>
+                                                <button
+                                                    onClick={() => handleRemoveExpense(expense.id)}
+                                                    className="text-red-600 hover:text-red-800 focus:outline-none"
+                                                >
+                                                    <Trash2 className="h-5 w-5" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>
