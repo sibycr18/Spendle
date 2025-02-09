@@ -3,37 +3,44 @@
     font-size: 0.875rem !important;
 }
 
+.react-datepicker-popper {
+    transform: translate3d(0, 0, 0) !important;
+    right: 0 !important;
+    left: auto !important;
+}
+
 .react-datepicker__month-container {
-    width: 220px !important;
+    width: 200px !important;
     position: relative !important;
 }
 
 .react-datepicker__month-wrapper {
     display: grid !important;
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 4px !important;
+    gap: 2px !important;
     padding: 2px !important;
 }
 
 .react-datepicker__month-text {
-    padding: 6px 4px !important;
+    padding: 4px 2px !important;
     margin: 0 !important;
     width: auto !important;
     border-radius: 4px !important;
-    font-size: 0.813rem !important;
-    line-height: 1.15rem !important;
+    font-size: 0.75rem !important;
+    line-height: 1rem !important;
     text-align: center !important;
 }
 
 .react-datepicker__month {
     margin: 0 !important;
-    padding: 0.5rem !important;
+    padding: 0.25rem !important;
 }
 
 .react-datepicker__header {
     background-color: white !important;
     border-bottom: 1px solid #e5e7eb !important;
-    padding: 0.5rem !important;
+    padding: 0.25rem !important;
+    margin-bottom: 0.25rem !important;
 }
 
 .react-datepicker__month-text:hover {
@@ -59,15 +66,15 @@
 }
 
 .datepicker-footer {
-    padding: 0.5rem !important;
+    padding: 0.25rem !important;
     border-top: 1px solid #e5e7eb !important;
     text-align: center !important;
 }
 
 .current-month-button {
     width: 100% !important;
-    padding: 0.5rem !important;
-    font-size: 0.813rem !important;
+    padding: 0.25rem !important;
+    font-size: 0.75rem !important;
     color: #2563eb !important;
     background: transparent !important;
     border: none !important;
@@ -78,4 +85,13 @@
 .current-month-button:hover {
     background-color: #f3f4f6 !important;
     border-radius: 4px !important;
+}
+
+@media (max-width: 640px) {
+    .react-datepicker-popper {
+        position: fixed !important;
+        transform: translate3d(-50%, 0, 0) !important;
+        left: 50% !important;
+        right: auto !important;
+    }
 }

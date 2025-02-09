@@ -45,6 +45,7 @@ export default function Dashboard() {
                 },
             ]);
             setNewIncomeSource({ name: '', amount: '' });
+            setIsAddingIncomeSource(false);
         }
     };
 
@@ -89,14 +90,14 @@ export default function Dashboard() {
     return (
         <div className="space-y-8 max-w-7xl mx-auto px-4 py-6">
             {/* Header */}
-            <div className="flex justify-between items-center">
-                <div>
+            <div className="flex flex-col sm:flex-row justify-between items-center sm:items-center gap-4 sm:gap-0">
+                <div className="text-center sm:text-left w-full sm:w-auto">
                     <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Dashboard</h1>
                     <p className="text-gray-700 mt-1">
                         {format(selectedMonth, 'MMMM yyyy')}
                     </p>
                 </div>
-                <div className="relative">
+                <div className="relative w-full sm:w-auto flex justify-center sm:justify-end">
                     <DatePicker
                         key={selectedMonth.getTime()}
                         selected={selectedMonth}
@@ -106,9 +107,9 @@ export default function Dashboard() {
                         showFullMonthYearPicker
                         showTwoColumnMonthYearPicker
                         customInput={
-                            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-gray-700">
-                                <Calendar className="h-5 w-5" />
-                                <span className="font-medium">{format(selectedMonth, 'MMMM yyyy')}</span>
+                            <button className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-gray-700 text-sm">
+                                <Calendar className="h-4 w-4" />
+                                <span className="font-medium">{format(selectedMonth, 'MMM yyyy')}</span>
                             </button>
                         }
                         calendarClassName="bg-white border border-gray-200 rounded-lg shadow-lg"
@@ -368,27 +369,27 @@ export default function Dashboard() {
                 )}
 
                 {/* Categories */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 [&>*]:h-fit">
                     {CATEGORIES.map((category) => (
-                        <div key={category} className="bg-gray-100 rounded-lg p-4 shadow-sm border border-gray-200">
-                            <div className="flex justify-between items-center mb-4">
+                        <div key={category} className="bg-gray-100 rounded-lg p-4 shadow-sm border border-gray-200 h-fit">
+                            <div className="flex justify-between items-center mb-3">
                                 <h3 className="font-medium text-gray-900 capitalize">{category}</h3>
                                 <span className="text-sm font-medium text-gray-700">
                                     Total: ₹{expensesByCategory[category].toFixed(2)}
                                 </span>
                             </div>
-                            <div className="space-y-3">
+                            <div className="space-y-2">
                                 {expenses
                                     .filter((expense) => expense.category === category)
                                     .map((expense) => (
                                         <div
                                             key={expense.id}
-                                            className="flex items-center justify-between bg-white p-4 rounded-md shadow-sm border border-gray-200"
+                                            className="flex items-center justify-between bg-white py-2 px-3 rounded-md shadow-sm border border-gray-200"
                                         >
                                             <span className="font-medium text-gray-900">
                                                 {expense.name}
                                             </span>
-                                            <div className="flex items-center gap-4">
+                                            <div className="flex items-center gap-3">
                                                 <span className="text-gray-900 font-medium">
                                                     ₹{expense.amount.toFixed(2)}
                                                 </span>
@@ -396,7 +397,7 @@ export default function Dashboard() {
                                                     onClick={() => handleRemoveExpense(expense.id)}
                                                     className="text-red-600 hover:text-red-800 focus:outline-none"
                                                 >
-                                                    <Trash2 className="h-5 w-5" />
+                                                    <Trash2 className="h-4 w-4" />
                                                 </button>
                                             </div>
                                         </div>
