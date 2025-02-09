@@ -1,27 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { supabase } from '../lib/supabase';
 import { Wallet } from 'lucide-react';
 import FloatingElements from './FloatingElements';
 
 export default function SignIn() {
+    const [error, setError] = useState<string | null>(null);
+
     const handleGoogleSignIn = async (credentialResponse: any) => {
         try {
-            const { data, error } = await supabase.auth.signInWithIdToken({
+            setError(null);
+            if (!credentialResponse?.credential) {
+                console.error('No credential received');
+                return;
+            }
+
+            const { data, error: signInError } = await supabase.auth.signInWithIdToken({
                 provider: 'google',
                 token: credentialResponse.credential,
             });
 
-            if (error) {
-                console.error('Error signing in with Google:', error.message);
-                // TODO: Add proper error handling
+            if (signInError) {
+                console.error('Error signing in with Google:', signInError.message);
+                setError('Failed to sign in. Please try again.');
                 return;
             }
 
             console.log('Successfully signed in:', data);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error signing in:', error);
-            // TODO: Add proper error handling
+            setError('An unexpected error occurred. Please try again.');
         }
     };
 
@@ -43,9 +51,16 @@ export default function SignIn() {
                                     <p className="text-gray-600">Your personal finance companion</p>
                                 </div>
 
+                                {error && (
+                                    <div className="w-full text-center text-red-600 text-sm bg-red-50 p-2 rounded">
+                                        {error}
+                                    </div>
+                                )}
+
                                 <div className="flex justify-center w-full">
                                     <button 
                                         onClick={() => {
+                                            setError(null);
                                             const googleLoginBtn = document.querySelector('[role="button"]') as HTMLElement;
                                             if (googleLoginBtn) googleLoginBtn.click();
                                         }}
@@ -65,8 +80,9 @@ export default function SignIn() {
                                                 onSuccess={handleGoogleSignIn}
                                                 onError={() => {
                                                     console.error('Google Sign In Failed');
+                                                    setError('Failed to connect to Google. Please try again.');
                                                 }}
-                                                useOneTap
+                                                useOneTap={false}
                                                 theme="filled_blue"
                                                 shape="pill"
                                                 size="large"
