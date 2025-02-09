@@ -5,7 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import Header from './components/Header';
 import SignIn from './components/SignIn';
-import Analytics as AnalyticsComponent from './components/Analytics';
+import { default as AnalyticsComponent } from './components/Analytics';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 function AppContent() {
