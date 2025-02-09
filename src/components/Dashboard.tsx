@@ -309,7 +309,7 @@ export default function Dashboard() {
                     />
                     <button
                         onClick={goToNextMonth}
-                        className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
+                        className="p- text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
                     >
                         <ChevronRight className="h-5 w-5" />
                     </button>
@@ -322,46 +322,46 @@ export default function Dashboard() {
                 <div className="bg-white rounded-lg shadow-md border border-gray-300 p-6">
                     <h2 className="text-lg font-semibold text-gray-900 mb-3">Summary</h2>
                     <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-blue-100 rounded-lg p-3 shadow-sm">
-                            <div className="text-xs text-blue-700 font-medium">Total Income</div>
-                            <div className="text-lg font-bold text-blue-800">
+                        <div className="bg-white rounded-lg p-3 shadow-sm border border-blue-200">
+                            <div className="text-xs font-medium text-black">Total Income</div>
+                            <div className="text-lg font-bold text-black">
                                 ₹{totalIncome.toFixed(2)}
                             </div>
-                            <div className={`text-xs font-medium ${calculateTrend(totalIncome, prevTotalIncome) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {calculateTrend(totalIncome, prevTotalIncome) >= 0 ? '↑' : '↓'} {Math.abs(calculateTrend(totalIncome, prevTotalIncome)).toFixed(1)}% vs last month
+                            <div className={`text-xs font-medium ${calculateTrend(totalIncome, prevTotalIncome) > 0 ? 'text-green-600' : calculateTrend(totalIncome, prevTotalIncome) < 0 ? 'text-red-600' : 'text-black'}`}>
+                                {calculateTrend(totalIncome, prevTotalIncome) > 0 ? '↑' : calculateTrend(totalIncome, prevTotalIncome) < 0 ? '↓' : '='} {Math.abs(calculateTrend(totalIncome, prevTotalIncome)).toFixed(1)}% vs last month
                             </div>
                         </div>
-                        <div className="bg-red-100 rounded-lg p-3 shadow-sm">
-                            <div className="text-xs text-red-700 font-medium">Total Expenses</div>
-                            <div className="text-lg font-bold text-red-800">
+                        <div className="bg-white rounded-lg p-3 shadow-sm border border-red-200">
+                            <div className="text-xs font-medium text-black">Total Expenses</div>
+                            <div className="text-lg font-bold text-black">
                                 ₹{totalExpenses.toFixed(2)}
                             </div>
-                            <div className={`text-xs font-medium ${calculateTrend(totalExpenses, prevTotalExpenses) >= 0 ? 'text-red-600' : 'text-green-600'}`}>
-                                {calculateTrend(totalExpenses, prevTotalExpenses) >= 0 ? '↑' : '↓'} {Math.abs(calculateTrend(totalExpenses, prevTotalExpenses)).toFixed(1)}% vs last month
+                            <div className={`text-xs font-medium ${calculateTrend(totalExpenses, prevTotalExpenses) > 0 ? 'text-red-600' : calculateTrend(totalExpenses, prevTotalExpenses) < 0 ? 'text-green-600' : 'text-black'}`}>
+                                {calculateTrend(totalExpenses, prevTotalExpenses) > 0 ? '↑' : calculateTrend(totalExpenses, prevTotalExpenses) < 0 ? '↓' : '='} {Math.abs(calculateTrend(totalExpenses, prevTotalExpenses)).toFixed(1)}% vs last month
                             </div>
                         </div>
-                        <div className="bg-green-100 rounded-lg p-3 shadow-sm">
-                            <div className="text-xs text-green-700 font-medium">
+                        <div className="bg-white rounded-lg p-3 shadow-sm border border-green-200">
+                            <div className="text-xs font-medium text-black">
                                 Remaining Balance
                             </div>
-                            <div className="text-lg font-bold text-green-800">
+                            <div className="text-lg font-bold text-black">
                                 ₹{(totalIncome - totalExpenses).toFixed(2)}
                             </div>
-                            <div className={`text-xs font-medium ${calculateTrend(totalIncome - totalExpenses, prevTotalIncome - prevTotalExpenses) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {calculateTrend(totalIncome - totalExpenses, prevTotalIncome - prevTotalExpenses) >= 0 ? '↑' : '↓'} {Math.abs(calculateTrend(totalIncome - totalExpenses, prevTotalIncome - prevTotalExpenses)).toFixed(1)}% vs last month
+                            <div className={`text-xs font-medium ${calculateTrend(totalIncome - totalExpenses, prevTotalIncome - prevTotalExpenses) > 0 ? 'text-green-600' : calculateTrend(totalIncome - totalExpenses, prevTotalIncome - prevTotalExpenses) < 0 ? 'text-red-600' : 'text-black'}`}>
+                                {calculateTrend(totalIncome - totalExpenses, prevTotalIncome - prevTotalExpenses) > 0 ? '↑' : calculateTrend(totalIncome - totalExpenses, prevTotalIncome - prevTotalExpenses) < 0 ? '↓' : '='} {Math.abs(calculateTrend(totalIncome - totalExpenses, prevTotalIncome - prevTotalExpenses)).toFixed(1)}% vs last month
                             </div>
                         </div>
-                        <div className="bg-purple-100 rounded-lg p-3 shadow-sm">
-                            <div className="text-xs text-purple-700 font-medium">
-                                Largest Expense
+                        <div className="bg-white rounded-lg p-3 shadow-sm border border-purple-200">
+                            <div className="text-xs font-medium text-black">
+                                Largest Spend
                             </div>
-                            <div className="text-lg font-bold text-purple-800">
+                            <div className="text-lg font-bold text-black">
                                 {getLargestExpenseCategory(expensesByCategory).category}
                             </div>
-                            <div className="text-xs font-medium text-purple-600">
+                            <div className="text-xs font-medium text-black">
                                 ₹{getLargestExpenseCategory(expensesByCategory).amount.toFixed(2)}
                             </div>
-                            <div className={`text-xs font-medium ${getLargestExpenseCategory(expensesByCategory).category === getLargestExpenseCategory(prevExpensesByCategory).category ? 'text-purple-600' : 'text-blue-600'}`}>
+                            <div className="text-xs font-medium text-gray-600">
                                 {getLargestExpenseCategory(expensesByCategory).category === getLargestExpenseCategory(prevExpensesByCategory).category ? 
                                     'Same as last month' : 
                                     `Was ${getLargestExpenseCategory(prevExpensesByCategory).category} last month`}
@@ -464,7 +464,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Add Expense Form */}
-                <div className="flex flex-col md:flex-row gap-4 p-4 bg-gray-100 rounded-lg mb-6 shadow-sm">
+                <div className="flex flex-col md:flex-row gap-4 p-2 bg-white rounded-lg mb-4 shadow-sm">
                     <div className="flex-1">
                         <select
                             value={newExpense.category}
@@ -514,7 +514,7 @@ export default function Dashboard() {
                         onClick={handleAddExpense}
                         className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 shadow-sm"
                     >
-                        <span>Save</span>
+                        <span>Add</span>
                     </button>
                 </div>
 
@@ -554,6 +554,11 @@ export default function Dashboard() {
                                             </div>
                                         </div>
                                     ))}
+                                {expenses.filter((expense) => expense.category === category).length === 0 && (
+                                    <div className="text-center py-2 text-gray-500">
+                                        No expenses here
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}

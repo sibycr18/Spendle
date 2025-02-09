@@ -28,8 +28,12 @@ const Header = () => {
     const handleSignOut = async () => {
         try {
             await signOut();
+            // Close the profile menu after successful sign out
+            setShowProfileMenu(false);
         } catch (error) {
             console.error('Error signing out:', error);
+            // Still close the menu even if there's an error
+            setShowProfileMenu(false);
         }
     };
 
@@ -42,7 +46,7 @@ const Header = () => {
                     <div className="flex items-center space-x-8">
                         <Link to="/" className="flex items-center">
                             <Wallet className="h-8 w-8 text-blue-600" />
-                            <span className="ml-2 text-xl font-bold text-gray-900">FinFlow</span>
+                            <span className="ml-2 text-xl font-bold text-gray-900">Spendle</span>
                         </Link>
                         <nav className="flex space-x-4">
                             <NavLink
