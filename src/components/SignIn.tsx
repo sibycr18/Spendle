@@ -39,8 +39,8 @@ export default function SignIn() {
                                 </div>
 
                                 <div className="text-center space-y-2">
-                                    <h2 className="text-2xl font-semibold text-gray-900">Welcome Back</h2>
-                                    <p className="text-gray-600">Sign in to manage your finances</p>
+                                    <h2 className="text-2xl font-semibold text-gray-900">Welcome to Spendle</h2>
+                                    <p className="text-gray-600">Your personal finance companion</p>
                                 </div>
 
                                 <div className="flex justify-center w-full">
