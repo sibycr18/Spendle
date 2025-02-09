@@ -34,8 +34,7 @@ export const db = {
         .from('income_sources')
         .select('*')
         .eq('user_id', userId)
-        .gte('date', startDate.toISOString())
-        .lte('date', endDate.toISOString())
+        .eq('date', startDate.toISOString())
         .order('date', { ascending: false });
 
       if (error) throw error;
@@ -70,8 +69,7 @@ export const db = {
         .from('expenses')
         .select('*')
         .eq('user_id', userId)
-        .gte('date', startDate.toISOString())
-        .lte('date', endDate.toISOString())
+        .eq('date', startDate.toISOString())
         .order('date', { ascending: false });
 
       if (error) throw error;
