@@ -30,15 +30,20 @@ export const db = {
   // Income functions
   income: {
     async getAll(userId: string, startDate: Date, endDate: Date) {
+      // Convert dates to YYYY-MM format for exact month matching
+      const startMonth = startDate.toISOString().slice(0, 7);
+      const endMonth = endDate.toISOString().slice(0, 7);
+
       const { data, error } = await supabase
         .from('income_sources')
         .select('*')
         .eq('user_id', userId)
-        .eq('date', startDate.toISOString())
-        .order('date', { ascending: false });
+        // Use to_char to convert the date column to YYYY-MM format for comparison
+        .gte("date", `${startMonth}-01`)
+        .lt("date", `${endMonth}-01T23:59:59.999Z`);
 
       if (error) throw error;
-      return data;
+      return data || [];
     },
 
     async add(income: Omit<Income, 'id' | 'created_at'>) {
@@ -69,7 +74,8 @@ export const db = {
         .from('expenses')
         .select('*')
         .eq('user_id', userId)
-        .eq('date', startDate.toISOString())
+        .gte('date', startDate.toISOString())
+        .lte('date', endDate.toISOString())
         .order('date', { ascending: false });
 
       if (error) throw error;

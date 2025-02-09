@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { Category, Income, Expense, MonthData } from '../types';
-import { Trash2, IndianRupee, X, Calendar } from 'lucide-react';
+import { Trash2, IndianRupee, X, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/datepicker.css";
@@ -64,11 +64,12 @@ export default function Dashboard() {
         if (!user) return;
         if (newIncomeSource.name && newIncomeSource.amount) {
             try {
+                const firstDayOfMonth = startOfMonth(selectedMonth);
                 const income = {
                     user_id: user.id,
                     name: newIncomeSource.name,
                     amount: parseFloat(newIncomeSource.amount),
-                    date: startOfMonth(selectedMonth).toISOString(),
+                    date: firstDayOfMonth.toISOString(),
                 };
                 
                 await db.income.add(income);
@@ -195,17 +196,46 @@ export default function Dashboard() {
         };
     };
 
+    const getCategoryColor = (category: Category) => {
+        switch (category) {
+            case 'investment':
+                return 'text-emerald-600';
+            case 'debt':
+                return 'text-orange-600';
+            case 'needs':
+                return 'text-blue-600';
+            case 'leisure':
+                return 'text-purple-600';
+            default:
+                return 'text-gray-800';
+        }
+    };
+
+    const goToPreviousMonth = () => {
+        setSelectedMonth(new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() - 1));
+    };
+
+    const goToNextMonth = () => {
+        setSelectedMonth(new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1));
+    };
+
     return (
-        <div className="space-y-8 max-w-7xl mx-auto px-4 py-6">
+        <div className="space-y-8 max-w-7xl mx-auto px-4 py-4">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-center sm:items-center gap-4 sm:gap-0">
-                <div className="text-center sm:text-left w-full sm:w-auto">
-                    <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Dashboard</h1>
-                    <p className="text-gray-700 mt-1">
-                        {format(selectedMonth, 'MMMM yyyy')}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+                    <p className="text-sm text-gray-600">
+                        Track your income and expenses
                     </p>
                 </div>
-                <div className="relative w-full sm:w-auto flex justify-center sm:justify-end">
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={goToPreviousMonth}
+                        className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
+                    >
+                        <ChevronLeft className="h-5 w-5" />
+                    </button>
                     <DatePicker
                         key={selectedMonth.getTime()}
                         selected={selectedMonth}
@@ -277,6 +307,12 @@ export default function Dashboard() {
                             </div>
                         }
                     />
+                    <button
+                        onClick={goToNextMonth}
+                        className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
+                    >
+                        <ChevronRight className="h-5 w-5" />
+                    </button>
                 </div>
             </div>
 
@@ -487,8 +523,10 @@ export default function Dashboard() {
                     {CATEGORIES.map((category) => (
                         <div key={category} className="bg-gray-100 rounded-lg p-4 shadow-sm border border-gray-200 h-fit">
                             <div className="flex justify-between items-center mb-3">
-                                <h3 className="font-medium text-gray-900 capitalize">{category}</h3>
-                                <span className="text-sm font-medium text-gray-700">
+                                <h3 className={`text-sm font-bold uppercase tracking-wide ${getCategoryColor(category)}`}>
+                                    {category}
+                                </h3>
+                                <span className="text-sm font-semibold text-gray-700">
                                     Total: ₹{expensesByCategory[category].toFixed(2)}
                                 </span>
                             </div>
