@@ -5,6 +5,8 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 
 interface UserType {
     email: string;
+    name?: string;
+    avatar_url?: string;
 }
 
 const Header = () => {
@@ -81,36 +83,37 @@ const Header = () => {
                     <div className="relative" ref={profileMenuRef}>
                         <button
                             onClick={() => setShowProfileMenu(!showProfileMenu)}
-                            className="flex items-center space-x-3 focus:outline-none"
+                            className="focus:outline-none"
                         >
-                            <div className="flex items-center space-x-3 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg transition-colors duration-200">
-                                <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
-                                    <span className="text-white font-medium text-sm">
-                                        {user.email?.[0].toUpperCase()}
+                            {user.avatar_url ? (
+                                <img 
+                                    src={user.avatar_url} 
+                                    alt="Profile" 
+                                    className="h-10 w-10 rounded-full object-cover shadow-md ring-1 ring-blue-600 ring-offset-2 ring-offset-white hover:ring-2 hover:ring-blue-500 transition-all duration-200"
+                                />
+                            ) : (
+                                <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center shadow-md ring-1 ring-blue-600 ring-offset-2 ring-offset-white hover:ring-2 hover:ring-blue-500 transition-all duration-200">
+                                    <span className="text-white font-medium text-base">
+                                        {user.name ? user.name[0].toUpperCase() : user.email?.[0].toUpperCase()}
                                     </span>
                                 </div>
-                                <span className="text-sm font-medium text-gray-700">
-                                    {user.email?.split('@')[0]}
-                                </span>
-                                <ChevronDown 
-                                    className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${
-                                        showProfileMenu ? 'transform rotate-180' : ''
-                                    }`} 
-                                />
-                            </div>
+                            )}
                         </button>
 
                         {showProfileMenu && (
-                            <div className="absolute right-0 mt-2 w-48 rounded-lg shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50">
+                            <div className="absolute right-0 mt-2 w-64 rounded-lg shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50">
                                 <div className="px-4 py-3 border-b border-gray-100">
                                     <p className="text-sm text-gray-500">Signed in as</p>
-                                    <p className="text-sm font-medium text-gray-900 truncate">
+                                    <p className="text-sm font-medium text-gray-900 truncate mt-1">
+                                        {user.name}
+                                    </p>
+                                    <p className="text-xs text-gray-500 truncate mt-0.5">
                                         {user.email}
                                     </p>
                                 </div>
                                 <button
                                     onClick={handleSignOut}
-                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2 transition-colors duration-200"
+                                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2 transition-colors duration-200"
                                 >
                                     <LogOut className="h-4 w-4" />
                                     <span>Sign out</span>

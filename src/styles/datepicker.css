@@ -1,90 +1,133 @@
 .react-datepicker {
     font-family: inherit !important;
     font-size: 0.875rem !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    padding: 0.75rem !important;
+    width: 280px !important;
+}
+
+.react-datepicker-wrapper {
+    width: auto !important;
+    display: inline-block !important;
+}
+
+.react-datepicker__input-container {
+    width: auto !important;
+    display: inline-block !important;
 }
 
 .react-datepicker-popper {
-    transform: translate3d(0, 0, 0) !important;
-    right: 0 !important;
-    left: auto !important;
+    z-index: 50 !important;
+    padding-top: 0.5rem !important;
+}
+
+.react-datepicker-popper[data-placement^="bottom"] {
+    padding-top: 0.5rem !important;
+}
+
+.react-datepicker-popper[data-placement^="top"] {
+    padding-bottom: 0.5rem !important;
 }
 
 .react-datepicker__month-container {
-    width: 200px !important;
-    position: relative !important;
+    float: none !important;
+    width: 100% !important;
+    background-color: white !important;
+}
+
+.react-datepicker__month {
+    margin: 0.5rem 0 !important;
+    padding: 0 0.5rem !important;
 }
 
 .react-datepicker__month-wrapper {
     display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 2px !important;
-    padding: 2px !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.5rem !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 .react-datepicker__month-text {
-    padding: 4px 2px !important;
+    padding: 0.5rem !important;
     margin: 0 !important;
     width: auto !important;
-    border-radius: 4px !important;
-    font-size: 0.75rem !important;
-    line-height: 1rem !important;
+    border-radius: 0.375rem !important;
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
     text-align: center !important;
-}
-
-.react-datepicker__month {
-    margin: 0 !important;
-    padding: 0.25rem !important;
+    cursor: pointer !important;
 }
 
 .react-datepicker__header {
     background-color: white !important;
-    border-bottom: 1px solid #e5e7eb !important;
-    padding: 0.25rem !important;
-    margin-bottom: 0.25rem !important;
+    border-bottom: none !important;
+    padding: 0 !important;
+    margin-bottom: 0.5rem !important;
+    border-top-left-radius: 0.5rem !important;
+    border-top-right-radius: 0.5rem !important;
 }
 
 .react-datepicker__month-text:hover {
     background-color: #f3f4f6 !important;
 }
 
+.react-datepicker__month-text--keyboard-selected,
 .react-datepicker__month-text--selected {
     background-color: #2563eb !important;
     color: white !important;
 }
 
-.react-datepicker__month-text--keyboard-selected {
-    background-color: #2563eb !important;
-    color: white !important;
-}
-
+.react-datepicker__month-text--keyboard-selected:hover,
 .react-datepicker__month-text--selected:hover {
     background-color: #1d4ed8 !important;
 }
 
-.react-datepicker__triangle {
-    display: none !important;
+.react-datepicker__navigation {
+    top: 1rem !important;
+}
+
+.react-datepicker__navigation--previous {
+    left: 1rem !important;
+}
+
+.react-datepicker__navigation--next {
+    right: 1rem !important;
+}
+
+.react-datepicker__current-month {
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    color: #1f2937 !important;
+    margin-bottom: 0.5rem !important;
 }
 
 .datepicker-footer {
-    padding: 0.25rem !important;
+    margin: 0 -0.75rem -0.75rem !important;
+    padding-top: 0.5rem !important;
     border-top: 1px solid #e5e7eb !important;
     text-align: center !important;
 }
 
-.current-month-button {
+.datepicker-footer button {
     width: 100% !important;
-    padding: 0.25rem !important;
-    font-size: 0.75rem !important;
-    color: #2563eb !important;
-    background: transparent !important;
-    border: none !important;
+    padding: 0.5rem !important;
+}
+
+.current-month-button {
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.875rem !important;
+    border-radius: 0.375rem !important;
+    background-color: #f3f4f6 !important;
+    color: #374151 !important;
     cursor: pointer !important;
-    font-weight: 500 !important;
+    border: none !important;
 }
 
 .current-month-button:hover {
-    background-color: #f3f4f6 !important;
-    border-radius: 4px !important;
+    background-color: #e5e7eb !important;
 }
 
 @media (max-width: 640px) {

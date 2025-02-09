@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, subMonths, startOfYear, endOfYear } from 'date-fns';
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
-import DatePicker from "react-datepicker";
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/supabase';
 import {
@@ -300,9 +299,12 @@ export default function Analytics() {
     };
 
     return (
-        <div className="space-y-8 max-w-7xl mx-auto px-4 py-4">
+        <div className="space-y-6 max-w-7xl mx-auto px-4 pt-4 pb-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
+                    <p className="mt-1 text-sm text-gray-600">View your spending patterns and financial trends</p>
+                </div>
                 <div className="inline-flex rounded-md shadow-sm" role="group">
                     <button
                         type="button"
@@ -331,46 +333,19 @@ export default function Analytics() {
 
             {/* Monthly Chart Section */}
             {chartType === 'monthly' && (
-                <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="bg-white rounded-lg shadow-md p-6 border border-gray-300">
                     <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-4">
-                            <h2 className="text-xl font-semibold text-gray-900">Monthly Performance</h2>
-                            <select
-                                value={monthlyPeriod}
-                                onChange={(e) => setMonthlyPeriod(Number(e.target.value))}
-                                className="px-3 py-1.5 bg-white border border-gray-300 rounded-md text-gray-700 text-sm shadow-sm"
-                            >
-                                <option value={3}>Last 3 Months</option>
-                                <option value={6}>Last 6 Months</option>
-                                <option value={12}>Last 12 Months</option>
-                            </select>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={goToPreviousMonth}
-                                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
-                            >
-                                <ChevronLeft className="h-5 w-5" />
-                            </button>
-                            <DatePicker
-                                selected={selectedMonth}
-                                onChange={(date: Date) => setSelectedMonth(startOfMonth(date))}
-                                dateFormat="MMMM yyyy"
-                                showMonthYearPicker
-                                customInput={
-                                    <button className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-gray-700 text-sm shadow-sm">
-                                        <Calendar className="h-4 w-4" />
-                                        <span className="font-medium">{format(selectedMonth, 'MMM yyyy')}</span>
-                                    </button>
-                                }
-                            />
-                            <button
-                                onClick={goToNextMonth}
-                                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
-                            >
-                                <ChevronRight className="h-5 w-5" />
-                            </button>
-                        </div>
+                        <h2 className="text-lg font-semibold text-gray-900">Monthly Analysis</h2>
+                        <select
+                            value={monthlyPeriod}
+                            onChange={(e) => setMonthlyPeriod(Number(e.target.value))}
+                            className="px-3 py-1.5 bg-white border border-gray-300 rounded-md text-gray-700 text-sm shadow-sm"
+                        >
+                            <option value={3}>Last 3 Months</option>
+                            <option value={6}>Last 6 Months</option>
+                            <option value={12}>Last 12 Months</option>
+                            <option value={24}>Last 24 Months</option>
+                        </select>
                     </div>
                     <div className="h-[400px]">
                         {isLoading ? (
@@ -386,38 +361,19 @@ export default function Analytics() {
 
             {/* Yearly Chart Section */}
             {chartType === 'yearly' && (
-                <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="bg-white rounded-lg shadow-md p-6 border border-gray-300">
                     <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-4">
-                            <h2 className="text-xl font-semibold text-gray-900">Yearly Performance</h2>
-                            <select
-                                value={yearlyPeriod}
-                                onChange={(e) => setYearlyPeriod(Number(e.target.value))}
-                                className="px-3 py-1.5 bg-white border border-gray-300 rounded-md text-gray-700 text-sm shadow-sm"
-                            >
-                                <option value={3}>Last 3 Years</option>
-                                <option value={5}>Last 5 Years</option>
-                                <option value={10}>Last 10 Years</option>
-                                <option value={new Date().getFullYear() - 2020}>Maximum</option>
-                            </select>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={goToPreviousYear}
-                                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
-                            >
-                                <ChevronLeft className="h-5 w-5" />
-                            </button>
-                            <span className="px-3 py-1.5 bg-white border border-gray-300 rounded-md text-gray-700 text-sm shadow-sm">
-                                {selectedYear}
-                            </span>
-                            <button
-                                onClick={goToNextYear}
-                                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
-                            >
-                                <ChevronRight className="h-5 w-5" />
-                            </button>
-                        </div>
+                        <h2 className="text-lg font-semibold text-gray-900">Yearly Analysis</h2>
+                        <select
+                            value={yearlyPeriod}
+                            onChange={(e) => setYearlyPeriod(Number(e.target.value))}
+                            className="px-3 py-1.5 bg-white border border-gray-300 rounded-md text-gray-700 text-sm shadow-sm"
+                        >
+                            <option value={3}>Last 3 Years</option>
+                            <option value={5}>Last 5 Years</option>
+                            <option value={10}>Last 10 Years</option>
+                            <option value={new Date().getFullYear() - 2020}>Maximum</option>
+                        </select>
                     </div>
                     <div className="h-[400px]">
                         {isLoading ? (

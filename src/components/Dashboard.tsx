@@ -232,84 +232,72 @@ export default function Dashboard() {
                 <div className="flex items-center gap-2">
                     <button
                         onClick={goToPreviousMonth}
-                        className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
+                        className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition duration-200"
                     >
                         <ChevronLeft className="h-5 w-5" />
                     </button>
-                    <DatePicker
-                        key={selectedMonth.getTime()}
-                        selected={selectedMonth}
-                        onChange={(date: Date) => setSelectedMonth(startOfMonth(date))}
-                        dateFormat="MMMM yyyy"
-                        showMonthYearPicker
-                        showFullMonthYearPicker
-                        showTwoColumnMonthYearPicker
-                        customInput={
-                            <button className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-gray-700 text-sm shadow-sm">
-                                <Calendar className="h-4 w-4" />
-                                <span className="font-medium">{format(selectedMonth, 'MMM yyyy')}</span>
-                            </button>
-                        }
-                        calendarClassName="bg-white border border-gray-200 rounded-lg shadow-lg"
-                        wrapperClassName="!block"
-                        popperClassName="!z-50"
-                        popperPlacement="bottom-end"
-                        popperModifiers={[
-                            {
-                                name: "offset",
-                                options: {
-                                    offset: [0, 8]
-                                }
+                    <div className="inline-block">
+                        <DatePicker
+                            selected={selectedMonth}
+                            onChange={(date: Date) => setSelectedMonth(startOfMonth(date))}
+                            dateFormat="MMMM yyyy"
+                            showMonthYearPicker
+                            customInput={
+                                <button className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-gray-700 text-sm shadow-sm">
+                                    <Calendar className="h-4 w-4" />
+                                    <span className="font-medium">{format(selectedMonth, 'MMM yyyy')}</span>
+                                </button>
                             }
-                        ]}
-                        renderCustomHeader={({
-                            date,
-                            decreaseYear,
-                            increaseYear,
-                            prevMonthButtonDisabled,
-                            nextMonthButtonDisabled
-                        }) => (
-                            <div className="flex justify-between items-center mb-2 px-2">
-                                <button
-                                    onClick={decreaseYear}
-                                    disabled={prevMonthButtonDisabled}
-                                    type="button"
-                                    className="p-1 hover:bg-gray-100 rounded-full disabled:opacity-50"
-                                >
-                                    <span className="text-gray-600">←</span>
-                                </button>
-                                <h2 className="text-sm font-medium text-gray-900">
-                                    {format(date, 'yyyy')}
-                                </h2>
-                                <button
-                                    onClick={increaseYear}
-                                    disabled={nextMonthButtonDisabled}
-                                    type="button"
-                                    className="p-1 hover:bg-gray-100 rounded-full disabled:opacity-50"
-                                >
-                                    <span className="text-gray-600">→</span>
-                                </button>
-                            </div>
-                        )}
-                        children={
+                            calendarClassName="bg-white border border-gray-200 rounded-lg shadow-lg"
+                            wrapperClassName="!block"
+                            popperClassName="!z-50"
+                            renderCustomHeader={({
+                                date,
+                                decreaseYear,
+                                increaseYear,
+                                prevMonthButtonDisabled,
+                                nextMonthButtonDisabled
+                            }) => (
+                                <div className="flex justify-between items-center mb-2 px-2">
+                                    <button
+                                        onClick={decreaseYear}
+                                        disabled={prevMonthButtonDisabled}
+                                        type="button"
+                                        className="p-1 hover:bg-gray-100 rounded-full disabled:opacity-50"
+                                    >
+                                        <span className="text-gray-600">←</span>
+                                    </button>
+                                    <h2 className="text-sm font-medium text-gray-900">
+                                        {format(date, 'yyyy')}
+                                    </h2>
+                                    <button
+                                        onClick={increaseYear}
+                                        disabled={nextMonthButtonDisabled}
+                                        type="button"
+                                        className="p-1 hover:bg-gray-100 rounded-full disabled:opacity-50"
+                                    >
+                                        <span className="text-gray-600">→</span>
+                                    </button>
+                                </div>
+                            )}
+                        >
                             <div className="datepicker-footer">
                                 <button
                                     onClick={(e) => {
                                         e.preventDefault();
-                                        const currentMonth = startOfMonth(new Date());
-                                        setSelectedMonth(currentMonth);
+                                        setSelectedMonth(startOfMonth(new Date()));
                                     }}
                                     type="button"
-                                    className="current-month-button"
+                                    className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded"
                                 >
                                     Current Month
                                 </button>
                             </div>
-                        }
-                    />
+                        </DatePicker>
+                    </div>
                     <button
                         onClick={goToNextMonth}
-                        className="p- text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
+                        className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition duration-200"
                     >
                         <ChevronRight className="h-5 w-5" />
                     </button>
