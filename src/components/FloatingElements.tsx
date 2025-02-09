@@ -8,16 +8,16 @@ export default function FloatingElements() {
             <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-blue-50"></div>
             
             {/* Floating elements */}
-            <div className="absolute top-1/4 left-1/4 animate-float-slow opacity-10">
+            <div className="absolute top-1/6 right-1/4 animate-float-slow opacity-20">
                 <Wallet className="h-16 w-16 text-blue-600" />
             </div>
-            <div className="absolute top-2/3 right-1/4 animate-float-delayed opacity-10">
+            <div className="absolute top-2/3 right-1/4 animate-float-delayed opacity-20">
                 <IndianRupee className="h-12 w-12 text-green-600" />
             </div>
-            <div className="absolute top-1/6 right-1/4 animate-float opacity-10">
+            <div className="absolute top-1/4 left-1/4 animate-float opacity-20">
                 <LineChart className="h-14 w-14 text-purple-600" />
             </div>
-            <div className="absolute bottom-1/4 right-1/6 animate-float-slow opacity-10">
+            <div className="absolute bottom-1/4 right-1/6 animate-float-slow opacity-20">
                 <PieChart className="h-10 w-10 text-blue-600" />
             </div>
             
