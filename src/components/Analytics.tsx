@@ -372,7 +372,6 @@ export default function Analytics() {
                             <option value={3}>Last 3 Years</option>
                             <option value={5}>Last 5 Years</option>
                             <option value={10}>Last 10 Years</option>
-                            <option value={new Date().getFullYear() - 2020}>Maximum</option>
                         </select>
                     </div>
                     <div className="h-[400px]">
