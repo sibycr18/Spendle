@@ -1,10 +1,11 @@
 import React from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import Header from './components/Header';
 import SignIn from './components/SignIn';
-import Analytics from './components/Analytics';
+import Analytics as AnalyticsComponent from './components/Analytics';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 function AppContent() {
@@ -29,7 +30,7 @@ function AppContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2">
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/analytics" element={<AnalyticsComponent />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
@@ -40,13 +41,14 @@ function AppContent() {
 
 function App() {
   return (
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-      <BrowserRouter>
-        <AuthProvider>
+    <AuthProvider>
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+        <BrowserRouter>
           <AppContent />
-        </AuthProvider>
-      </BrowserRouter>
-    </GoogleOAuthProvider>
+          <Analytics />
+        </BrowserRouter>
+      </GoogleOAuthProvider>
+    </AuthProvider>
   );
 }
 
