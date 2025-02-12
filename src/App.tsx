@@ -8,14 +8,15 @@ import SignIn from './components/SignIn';
 import { default as AnalyticsComponent } from './components/Analytics';
 import { default as RecurringComponent } from './components/Recurring';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 function AppContent() {
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      <div className="flex items-center justify-center min-h-screen bg-white dark:bg-gray-900">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
       </div>
     );
   }
@@ -25,7 +26,7 @@ function AppContent() {
   }
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div className="h-screen flex flex-col overflow-hidden bg-gray-50 dark:bg-gray-900">
       <Header />
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2">
@@ -43,14 +44,16 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-        <BrowserRouter>
-          <AppContent />
-          <Analytics />
-        </BrowserRouter>
-      </GoogleOAuthProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+          <BrowserRouter>
+            <AppContent />
+            <Analytics />
+          </BrowserRouter>
+        </GoogleOAuthProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

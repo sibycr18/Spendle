@@ -17,8 +17,7 @@ export default function Logo({ className = "h-8 w-8" }: LogoProps) {
                 cx="16"
                 cy="16"
                 r="15"
-                fill="#3B82F6"
-                className="drop-shadow-md"
+                className="fill-blue-500 dark:fill-blue-400 drop-shadow-md"
             />
             
             {/* Coin Stack */}
