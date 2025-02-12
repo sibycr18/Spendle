@@ -70,12 +70,17 @@ export const db = {
   // Expense functions
   expenses: {
     async getAll(userId: string, startDate: Date, endDate: Date) {
+      // Convert dates to YYYY-MM format for exact month matching
+      const startMonth = startDate.toISOString().slice(0, 7);
+      const endMonth = endDate.toISOString().slice(0, 7);
+
       const { data, error } = await supabase
         .from('expenses')
         .select('*')
         .eq('user_id', userId)
-        .gte('date', startDate.toISOString())
-        .lte('date', endDate.toISOString())
+        // Use same format as income query
+        .gte("date", `${startMonth}-01`)
+        .lt("date", `${endMonth}-01T23:59:59.999Z`)
         .order('date', { ascending: false });
 
       if (error) throw error;

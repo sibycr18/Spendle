@@ -56,13 +56,32 @@ export async function deleteRecurringTransaction(id: string) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    const { error } = await supabase
+    // First, check if there are any related expenses
+    const { data: relatedExpenses, error: checkError } = await supabase
+        .from('expenses')
+        .select('*')
+        .eq('recurring_id', id)
+        .eq('user_id', user.id);
+
+    if (checkError) throw checkError;
+
+    if (relatedExpenses && relatedExpenses.length > 0) {
+        const { error: updateError } = await supabase
+            .from('expenses')
+            .update({ recurring_id: null })
+            .eq('recurring_id', id)
+            .eq('user_id', user.id);
+
+        if (updateError) throw updateError;
+    }
+
+    const { error: deleteError } = await supabase
         .from('recurring_transactions')
         .delete()
         .eq('id', id)
         .eq('user_id', user.id);
 
-    if (error) throw error;
+    if (deleteError) throw deleteError;
 }
 
 // Toggle the active status of a recurring transaction
@@ -98,6 +117,8 @@ export async function processMonthlyRecurringTransactions() {
         .eq('active', true);
 
     if (fetchError) throw fetchError;
+    
+    console.log('Found recurring transactions:', recurringTransactions); // Debug log
 
     // 2. Split into income and expenses
     const recurringIncome = recurringTransactions.filter(t => t.type === 'income');
@@ -134,36 +155,48 @@ export async function processMonthlyRecurringTransactions() {
 
     // 6. Create new income entries
     if (unprocessedIncome.length > 0) {
+        console.log('Processing income:', unprocessedIncome);
         const { error: insertIncomeError } = await supabase
             .from('income_sources')
             .insert(
                 unprocessedIncome.map(recurring => ({
                     name: recurring.name,
                     amount: recurring.amount,
-                    type: recurring.type,
                     is_recurring: true,
-                    recurring_id: recurring.id
+                    recurring_id: recurring.id,
+                    user_id: user.id,
+                    date: firstDayOfMonth.toISOString(),
+                    created_at: new Date().toISOString()
                 }))
             );
 
-        if (insertIncomeError) throw insertIncomeError;
+        if (insertIncomeError) {
+            console.error('Error inserting income:', insertIncomeError);
+            throw insertIncomeError;
+        }
     }
 
     // 7. Create new expense entries
     if (unprocessedExpenses.length > 0) {
+        console.log('Processing expenses:', unprocessedExpenses);
         const { error: insertExpenseError } = await supabase
             .from('expenses')
             .insert(
                 unprocessedExpenses.map(recurring => ({
                     name: recurring.name,
                     amount: recurring.amount,
-                    type: recurring.type,
                     category: recurring.category,
                     is_recurring: true,
-                    recurring_id: recurring.id
+                    recurring_id: recurring.id,
+                    user_id: user.id,
+                    date: firstDayOfMonth.toISOString(),
+                    created_at: new Date().toISOString()
                 }))
             );
 
-        if (insertExpenseError) throw insertExpenseError;
+        if (insertExpenseError) {
+            console.error('Error inserting expenses:', insertExpenseError);
+            throw insertExpenseError;
+        }
     }
 }

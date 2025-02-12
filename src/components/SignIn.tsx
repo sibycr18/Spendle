@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { supabase } from '../lib/supabase';
 import { Wallet } from 'lucide-react';
 import FloatingElements from './FloatingElements';
 
 export default function SignIn() {
+    const [isLoading, setIsLoading] = useState(false);
+
     const handleGoogleSignIn = async (credentialResponse: any) => {
+        setIsLoading(true);
         try {
             const { data, error } = await supabase.auth.signInWithIdToken({
                 provider: 'google',
@@ -22,11 +25,26 @@ export default function SignIn() {
         } catch (error) {
             console.error('Error signing in:', error);
             // TODO: Add proper error handling
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
         <div className="min-h-screen flex flex-col">
+            {isLoading && (
+                <>
+                    <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-40"></div>
+                    <div className="fixed inset-0 z-50 flex items-center justify-center">
+                        <div className="flex flex-col items-center gap-4 text-center bg-white p-8 rounded-xl shadow-xl border border-gray-200">
+                            <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div className="w-full h-full bg-blue-600 animate-loading-bar"></div>
+                            </div>
+                            <p className="text-base text-gray-600">Signing you in</p>
+                        </div>
+                    </div>
+                </>
+            )}
             <FloatingElements />
             <div className="flex-1 flex flex-col items-center justify-center mt-16">
                 <div className="w-full max-w-md mx-auto">

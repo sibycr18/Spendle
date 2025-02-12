@@ -8,11 +8,9 @@ import SignIn from './components/SignIn';
 import { default as AnalyticsComponent } from './components/Analytics';
 import { default as RecurringComponent } from './components/Recurring';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { useRecurringProcessor } from './hooks/useRecurringProcessor';
 
 function AppContent() {
   const { user, loading } = useAuth();
-  useRecurringProcessor(user); // Move hook to top level and add user as a dependency
 
   if (loading) {
     return (
