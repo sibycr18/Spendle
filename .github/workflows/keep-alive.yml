@@ -11,11 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping Supabase
-        uses: supabase/supabase-js@v2
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
-          curl -X GET "$SUPABASE_URL/rest/v1/rpc/keepalive" \
-          -H "apikey: $SUPABASE_KEY" \
-          -H "Authorization: Bearer $SUPABASE_KEY"
+          curl -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/rpc/keepalive" \
+          -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+          -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
