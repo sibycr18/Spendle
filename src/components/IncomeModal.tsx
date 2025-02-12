@@ -1,26 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, IndianRupee } from 'lucide-react';
 import { createPortal } from 'react-dom';
+import { Income } from '../types';
+import { createRecurringTransaction } from '../lib/recurring';
 
 interface Props {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (income: { name: string; amount: number }) => void;
+    onSave: (income: { name: string; amount: number; is_recurring?: boolean }) => void;
+    income?: Income;
 }
 
-export default function IncomeModal({ isOpen, onClose, onSave }: Props) {
+export default function IncomeModal({ isOpen, onClose, onSave, income }: Props) {
     const [formData, setFormData] = useState({
         name: '',
         amount: '',
+        is_recurring: false,
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    useEffect(() => {
+        if (income) {
+            setFormData({
+                name: income.name,
+                amount: income.amount.toString(),
+                is_recurring: income.is_recurring || false,
+            });
+        } else {
+            setFormData({
+                name: '',
+                amount: '',
+                is_recurring: false,
+            });
+        }
+    }, [income]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        // Create the income
         onSave({
             name: formData.name.trim(),
             amount: parseFloat(formData.amount),
+            is_recurring: formData.is_recurring,
         });
+
         onClose();
+        setFormData({ name: '', amount: '', is_recurring: false });
     };
 
     if (!isOpen) return null;
@@ -32,7 +57,7 @@ export default function IncomeModal({ isOpen, onClose, onSave }: Props) {
                 <div className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden">
                     <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
                         <h2 className="text-lg font-semibold text-gray-900">
-                            Add Income
+                            {income ? 'Edit Income' : 'Add Income'}
                         </h2>
                         <button
                             onClick={onClose}
@@ -77,9 +102,24 @@ export default function IncomeModal({ isOpen, onClose, onSave }: Props) {
                                     </div>
                                 </div>
                             </div>
+
+                            {!income && (
+                                <div className="flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        id="is_recurring"
+                                        checked={formData.is_recurring}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, is_recurring: e.target.checked }))}
+                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                    />
+                                    <label htmlFor="is_recurring" className="ml-2 block text-sm text-gray-700">
+                                        Make this a recurring income
+                                    </label>
+                                </div>
+                            )}
                         </div>
 
-                        <div className="flex items-center justify-end space-x-3 pt-5 mt-5 border-t border-gray-100">
+                        <div className="mt-6 flex justify-end gap-3">
                             <button
                                 type="button"
                                 onClick={onClose}
@@ -91,7 +131,7 @@ export default function IncomeModal({ isOpen, onClose, onSave }: Props) {
                                 type="submit"
                                 className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 transition-colors"
                             >
-                                Add Income
+                                {income ? 'Save Changes' : 'Add Income'}
                             </button>
                         </div>
                     </form>

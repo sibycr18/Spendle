@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { Category, Income, Expense, MonthData } from '../types';
-import { Trash2, IndianRupee, X, Calendar, ChevronLeft, ChevronRight, ArrowDownCircle, ChevronDown, Plus } from 'lucide-react';
+import { Trash2, IndianRupee, X, Calendar, ChevronLeft, ChevronRight, ArrowDownCircle, ChevronDown, Plus, Edit2 } from 'lucide-react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/datepicker.css";
 import { db } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { processMonthlyRecurringTransactions } from '../lib/recurring';
+import { processMonthlyRecurringTransactions, createRecurringTransaction } from '../lib/recurring';
 import { toast } from 'react-hot-toast';
 import IncomeModal from './IncomeModal';
 import ExpenseModal from './ExpenseModal';
@@ -29,8 +29,11 @@ export default function Dashboard() {
     const [prevIncomeSources, setPrevIncomeSources] = useState<Income[]>([]);
     const [prevExpenses, setPrevExpenses] = useState<Expense[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isImporting, setIsImporting] = useState(false);
     const [isIncomeModalOpen, setIsIncomeModalOpen] = useState(false);
     const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+    const [editingIncome, setEditingIncome] = useState<Income | undefined>();
+    const [editingExpense, setEditingExpense] = useState<Expense | undefined>();
 
     // Fetch data when month changes
     useEffect(() => {
@@ -165,6 +168,8 @@ export default function Dashboard() {
     };
 
     const handleImportRecurring = async () => {
+        if (!user) return;
+        setIsImporting(true);
         try {
             await processMonthlyRecurringTransactions();
             // Refresh the data after importing
@@ -180,6 +185,43 @@ export default function Dashboard() {
         } catch (error) {
             console.error('Error importing recurring transactions:', error);
             toast.error('Failed to import recurring transactions');
+        } finally {
+            setIsImporting(false);
+        }
+    };
+
+    const handleEditIncome = async (income: { name: string; amount: number }) => {
+        if (!user || !editingIncome) return;
+        try {
+            await db.income.update(editingIncome.id, income);
+            
+            // Refresh the data
+            const startDate = startOfMonth(selectedMonth);
+            const endDate = endOfMonth(selectedMonth);
+            if (!user) return;
+            const updatedIncomes = await db.income.getAll(user.id, startDate, endDate);
+            setIncomeSources(updatedIncomes);
+            toast.success('Income updated successfully');
+        } catch (error) {
+            console.error('Error updating income:', error);
+            toast.error('Failed to update income');
+        }
+    };
+
+    const handleEditExpense = async (expense: { name: string; amount: number; category: Category }) => {
+        if (!user || !editingExpense) return;
+        try {
+            await db.expenses.update(editingExpense.id, expense);
+            
+            // Refresh the data
+            const startDate = startOfMonth(selectedMonth);
+            const endDate = endOfMonth(selectedMonth);
+            const updatedExpenses = await db.expenses.getAll(user.id, startDate, endDate);
+            setExpenses(updatedExpenses);
+            toast.success('Expense updated successfully');
+        } catch (error) {
+            console.error('Error updating expense:', error);
+            toast.error('Failed to update expense');
         }
     };
 
@@ -209,10 +251,24 @@ export default function Dashboard() {
                 <div className="flex flex-col sm:flex-row items-center gap-2">
                     <button
                         onClick={handleImportRecurring}
-                        className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors duration-200 w-full sm:w-auto justify-center"
+                        disabled={isImporting}
+                        className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm border rounded-md transition-colors duration-200 w-full sm:w-auto justify-center ${
+                            isImporting 
+                                ? 'bg-blue-50 text-blue-400 border-blue-100 cursor-not-allowed'
+                                : 'text-blue-600 bg-blue-50 border-blue-200 hover:bg-blue-100'
+                        }`}
                     >
-                        <ArrowDownCircle className="w-4 h-4" />
-                        Import Recurring Transactions
+                        {isImporting ? (
+                            <>
+                                <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+                                Importing...
+                            </>
+                        ) : (
+                            <>
+                                <ArrowDownCircle className="w-4 h-4" />
+                                Import Recurring Transactions
+                            </>
+                        )}
                     </button>
                     <div className="flex items-center gap-2">
                         <button
@@ -363,6 +419,15 @@ export default function Dashboard() {
                                                 {formatIndianNumber(source.amount)}
                                             </span>
                                             <button
+                                                onClick={() => {
+                                                    setEditingIncome(source);
+                                                    setIsIncomeModalOpen(true);
+                                                }}
+                                                className="p-1 text-gray-400 hover:text-blue-500"
+                                            >
+                                                <Edit2 className="h-4 w-4" />
+                                            </button>
+                                            <button
                                                 onClick={() => handleDeleteIncome(source.id)}
                                                 className="p-1 text-gray-400 hover:text-red-500"
                                             >
@@ -423,6 +488,15 @@ export default function Dashboard() {
                                                     {formatIndianNumber(expense.amount)}
                                                 </span>
                                                 <button
+                                                    onClick={() => {
+                                                        setEditingExpense(expense);
+                                                        setIsExpenseModalOpen(true);
+                                                    }}
+                                                    className="p-1 text-gray-400 hover:text-blue-500"
+                                                >
+                                                    <Edit2 className="h-4 w-4" />
+                                                </button>
+                                                <button
                                                     onClick={() => handleDeleteExpense(expense.id)}
                                                     className="p-1 text-gray-400 hover:text-red-500"
                                                 >
@@ -471,58 +545,115 @@ export default function Dashboard() {
             {/* Income Modal */}
             <IncomeModal
                 isOpen={isIncomeModalOpen}
-                onClose={() => setIsIncomeModalOpen(false)}
-                onSave={async (income) => {
-                    try {
-                        const firstDayOfMonth = startOfMonth(selectedMonth);
-                        await db.income.add({
-                            user_id: user.id,
-                            name: income.name,
-                            amount: income.amount,
-                            date: firstDayOfMonth.toISOString(),
-                        });
-                        
-                        // Refresh the data
-                        const startDate = startOfMonth(selectedMonth);
-                        const endDate = endOfMonth(selectedMonth);
-                        const updatedIncomes = await db.income.getAll(user.id, startDate, endDate);
-                        setIncomeSources(updatedIncomes);
-                        
-                        toast.success('Income added successfully');
-                    } catch (error) {
-                        console.error('Error adding income:', error);
-                        toast.error('Failed to add income');
-                    }
+                onClose={() => {
+                    setIsIncomeModalOpen(false);
+                    setEditingIncome(undefined);
                 }}
+                onSave={async (income) => {
+                    if (!user) return;
+                    
+                    if (editingIncome) {
+                        await handleEditIncome(income);
+                    } else {
+                        try {
+                            const firstDayOfMonth = startOfMonth(selectedMonth);
+
+                            // If it's a recurring income, create the recurring transaction first
+                            let recurring_id: string | undefined;
+                            if (income.is_recurring) {
+                                const recurringTransaction = await createRecurringTransaction({
+                                    name: income.name,
+                                    amount: income.amount,
+                                    type: 'income',
+                                    active: true,
+                                });
+                                recurring_id = recurringTransaction.id;
+                            }
+
+                            // Then create the income with the recurring_id if it exists
+                            await db.income.add({
+                                user_id: user.id,
+                                name: income.name,
+                                amount: income.amount,
+                                date: firstDayOfMonth.toISOString(),
+                                is_recurring: income.is_recurring || false,
+                                recurring_id: recurring_id,
+                            });
+                            
+                            // Refresh the data
+                            const startDate = startOfMonth(selectedMonth);
+                            const endDate = endOfMonth(selectedMonth);
+                            const updatedIncomes = await db.income.getAll(user.id, startDate, endDate);
+                            setIncomeSources(updatedIncomes);
+                            
+                            toast.success('Income added successfully');
+                        } catch (error) {
+                            console.error('Error adding income:', error);
+                            toast.error('Failed to add income');
+                        }
+                    }
+                    setIsIncomeModalOpen(false);
+                    setEditingIncome(undefined);
+                }}
+                income={editingIncome}
             />
 
             {/* Expense Modal */}
             <ExpenseModal
                 isOpen={isExpenseModalOpen}
-                onClose={() => setIsExpenseModalOpen(false)}
-                onSave={async (expense) => {
-                    try {
-                        const firstDayOfMonth = startOfMonth(selectedMonth);
-                        await db.expenses.add({
-                            user_id: user.id,
-                            name: expense.name,
-                            amount: expense.amount,
-                            category: expense.category,
-                            date: firstDayOfMonth.toISOString(),
-                        });
-                        
-                        // Refresh the data
-                        const startDate = startOfMonth(selectedMonth);
-                        const endDate = endOfMonth(selectedMonth);
-                        const updatedExpenses = await db.expenses.getAll(user.id, startDate, endDate);
-                        setExpenses(updatedExpenses);
-                        
-                        toast.success('Expense added successfully');
-                    } catch (error) {
-                        console.error('Error adding expense:', error);
-                        toast.error('Failed to add expense');
-                    }
+                onClose={() => {
+                    setIsExpenseModalOpen(false);
+                    setEditingExpense(undefined);
                 }}
+                onSave={async (expense) => {
+                    if (!user) return;
+                    
+                    if (editingExpense) {
+                        await handleEditExpense(expense);
+                    } else {
+                        try {
+                            const firstDayOfMonth = startOfMonth(selectedMonth);
+                            
+                            // If it's a recurring expense, create the recurring transaction first
+                            let recurring_id: string | undefined;
+                            if (expense.is_recurring) {
+                                const recurringTransaction = await createRecurringTransaction({
+                                    name: expense.name,
+                                    amount: expense.amount,
+                                    type: 'expense',
+                                    category: expense.category,
+                                    active: true,
+                                });
+                                recurring_id = recurringTransaction.id;
+                            }
+
+                            // Then create the expense with the recurring_id if it exists
+                            await db.expenses.add({
+                                user_id: user.id,
+                                name: expense.name,
+                                amount: expense.amount,
+                                category: expense.category,
+                                date: firstDayOfMonth.toISOString(),
+                                is_recurring: expense.is_recurring || false,
+                                recurring_id: recurring_id,
+                            });
+                            
+                            // Refresh the data
+                            const startDate = startOfMonth(selectedMonth);
+                            const endDate = endOfMonth(selectedMonth);
+                            const updatedExpenses = await db.expenses.getAll(user.id, startDate, endDate);
+                            setExpenses(updatedExpenses);
+                            
+                            toast.success('Expense added successfully');
+                        } catch (error) {
+                            console.error('Error adding expense:', error);
+                            toast.error('Failed to add expense');
+                        }
+                    }
+                    setIsExpenseModalOpen(false);
+                    setEditingExpense(undefined);
+                }}
+                expense={editingExpense}
             />
         </div>
     );

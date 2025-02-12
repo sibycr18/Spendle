@@ -53,35 +53,38 @@ export async function updateRecurringTransaction({ id, ...updates }: UpdateRecur
 
 // Delete a recurring transaction
 export async function deleteRecurringTransaction(id: string) {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+    // First, remove the recurring_id reference from any income sources
+    const { error: updateError } = await supabase
+        .from('income_sources')
+        .update({ recurring_id: null, is_recurring: false })
+        .eq('recurring_id', id);
 
-    // First, check if there are any related expenses
-    const { data: relatedExpenses, error: checkError } = await supabase
-        .from('expenses')
-        .select('*')
-        .eq('recurring_id', id)
-        .eq('user_id', user.id);
-
-    if (checkError) throw checkError;
-
-    if (relatedExpenses && relatedExpenses.length > 0) {
-        const { error: updateError } = await supabase
-            .from('expenses')
-            .update({ recurring_id: null })
-            .eq('recurring_id', id)
-            .eq('user_id', user.id);
-
-        if (updateError) throw updateError;
+    if (updateError) {
+        console.error('Error updating income sources:', updateError);
+        throw updateError;
     }
 
-    const { error: deleteError } = await supabase
+    // Then, remove the recurring_id reference from any expenses
+    const { error: updateExpenseError } = await supabase
+        .from('expenses')
+        .update({ recurring_id: null, is_recurring: false })
+        .eq('recurring_id', id);
+
+    if (updateExpenseError) {
+        console.error('Error updating expenses:', updateExpenseError);
+        throw updateExpenseError;
+    }
+
+    // Finally, delete the recurring transaction
+    const { error } = await supabase
         .from('recurring_transactions')
         .delete()
-        .eq('id', id)
-        .eq('user_id', user.id);
+        .eq('id', id);
 
-    if (deleteError) throw deleteError;
+    if (error) {
+        console.error('Error deleting recurring transaction:', error);
+        throw error;
+    }
 }
 
 // Toggle the active status of a recurring transaction

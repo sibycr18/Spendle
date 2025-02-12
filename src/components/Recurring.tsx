@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Plus, ArrowUpCircle, ArrowDownCircle, Wallet, Edit2, Pause, Play, Trash2 } from 'lucide-react';
+import { Plus, ArrowUpCircle, ArrowDownCircle, Wallet, Edit2, Pause, Play, Trash2, Circle } from 'lucide-react';
 import { RecurringTransaction, Category } from '../types';
 import RecurringTransactionModal from './RecurringTransactionModal';
 import { 
@@ -256,9 +256,10 @@ export default function Recurring() {
                                             </div>
                                             <div>
                                                 <h3 className="text-sm font-medium text-gray-900">{transaction.name}</h3>
-                                                {transaction.type === 'expense' && (
-                                                    <p className={`text-xs ${getCategoryColor(transaction.category)}`}>
-                                                        {transaction.category}
+                                                {transaction.type === 'expense' && transaction.category && (
+                                                    <p className={`text-xs ${getCategoryColor(transaction.category)} flex items-center gap-1`}>
+                                                        <Circle className="h-1.5 w-1.5 fill-current opacity-75" />
+                                                        {transaction.category.charAt(0).toUpperCase() + transaction.category.slice(1)}
                                                     </p>
                                                 )}
                                             </div>

@@ -1,31 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, IndianRupee, ChevronDown } from 'lucide-react';
 import { createPortal } from 'react-dom';
-import { Category } from '../types';
+import { Category, Expense } from '../types';
+import { createRecurringTransaction } from '../lib/recurring';
 
 const CATEGORIES: Category[] = ['investment', 'debt', 'needs', 'leisure'];
 
 interface Props {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (expense: { name: string; amount: number; category: Category }) => void;
+    onSave: (expense: { name: string; amount: number; category: Category; is_recurring?: boolean }) => void;
+    expense?: Expense;
 }
 
-export default function ExpenseModal({ isOpen, onClose, onSave }: Props) {
+export default function ExpenseModal({ isOpen, onClose, onSave, expense }: Props) {
     const [formData, setFormData] = useState({
         name: '',
         amount: '',
-        category: 'needs' as Category
+        category: CATEGORIES[0],
+        is_recurring: false,
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    useEffect(() => {
+        if (expense) {
+            setFormData({
+                name: expense.name,
+                amount: expense.amount.toString(),
+                category: expense.category,
+                is_recurring: expense.is_recurring || false,
+            });
+        } else {
+            setFormData({
+                name: '',
+                amount: '',
+                category: CATEGORIES[0],
+                is_recurring: false,
+            });
+        }
+    }, [expense]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        // Create the expense
         onSave({
             name: formData.name.trim(),
             amount: parseFloat(formData.amount),
-            category: formData.category
+            category: formData.category,
+            is_recurring: formData.is_recurring,
         });
+
         onClose();
+        setFormData({ name: '', amount: '', category: CATEGORIES[0], is_recurring: false });
     };
 
     if (!isOpen) return null;
@@ -37,7 +63,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave }: Props) {
                 <div className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden">
                     <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
                         <h2 className="text-lg font-semibold text-gray-900">
-                            Add Expense
+                            {expense ? 'Edit Expense' : 'Add Expense'}
                         </h2>
                         <button
                             onClick={onClose}
@@ -50,36 +76,13 @@ export default function ExpenseModal({ isOpen, onClose, onSave }: Props) {
                     <form onSubmit={handleSubmit} className="p-6">
                         <div className="space-y-5">
                             <div className="space-y-1.5">
-                                <label className="block text-sm font-medium text-gray-700">Category</label>
-                                <div className="relative">
-                                    <select
-                                        value={formData.category}
-                                        onChange={(e) => setFormData(prev => ({ 
-                                            ...prev, 
-                                            category: e.target.value as Category 
-                                        }))}
-                                        className="w-full px-3 py-2.5 border-0 rounded-lg text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 focus:outline-none text-sm appearance-none"
-                                    >
-                                        {CATEGORIES.map((category) => (
-                                            <option key={category} value={category}>
-                                                {category.charAt(0).toUpperCase() + category.slice(1)}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                                        <ChevronDown className="h-4 w-4 text-gray-500" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="space-y-1.5">
                                 <label className="block text-sm font-medium text-gray-700">Name</label>
                                 <input
                                     type="text"
                                     value={formData.name}
                                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                                     className="block w-full rounded-lg border-0 px-3 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 focus:outline-none sm:text-sm sm:leading-6"
-                                    placeholder="e.g. Rent, Groceries"
+                                    placeholder="e.g. Groceries, Rent"
                                     required
                                 />
                             </div>
@@ -105,9 +108,44 @@ export default function ExpenseModal({ isOpen, onClose, onSave }: Props) {
                                     </div>
                                 </div>
                             </div>
+
+                            <div className="space-y-1.5">
+                                <label className="block text-sm font-medium text-gray-700">Category</label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {CATEGORIES.map((category) => (
+                                        <button
+                                            key={category}
+                                            type="button"
+                                            onClick={() => setFormData(prev => ({ ...prev, category }))}
+                                            className={`py-2.5 px-4 rounded-lg text-sm font-medium transition-colors shadow-sm hover:shadow ring-1 ring-inset ${
+                                                formData.category === category
+                                                    ? 'bg-blue-50 text-blue-600 ring-blue-600/20 shadow-blue-100'
+                                                    : 'text-gray-600 hover:bg-gray-50 ring-gray-300'
+                                            }`}
+                                        >
+                                            {category.charAt(0).toUpperCase() + category.slice(1)}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {!expense && (
+                                <div className="flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        id="is_recurring"
+                                        checked={formData.is_recurring}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, is_recurring: e.target.checked }))}
+                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                    />
+                                    <label htmlFor="is_recurring" className="ml-2 block text-sm text-gray-700">
+                                        Make this a recurring expense
+                                    </label>
+                                </div>
+                            )}
                         </div>
 
-                        <div className="flex items-center justify-end space-x-3 pt-5 mt-5 border-t border-gray-100">
+                        <div className="mt-6 flex justify-end gap-3">
                             <button
                                 type="button"
                                 onClick={onClose}
@@ -119,7 +157,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave }: Props) {
                                 type="submit"
                                 className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 transition-colors"
                             >
-                                Add Expense
+                                {expense ? 'Save Changes' : 'Add Expense'}
                             </button>
                         </div>
                     </form>

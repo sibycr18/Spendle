@@ -30,7 +30,7 @@ export default function RecurringTransactionModal({ isOpen, onClose, onSave, tra
                 amount: transaction.amount.toString(),
                 type: transaction.type,
                 category: transaction.category || 'needs',
-                active: transaction.active
+                active: true
             });
             setShowCategory(transaction.type === 'expense');
         } else {
@@ -61,7 +61,7 @@ export default function RecurringTransactionModal({ isOpen, onClose, onSave, tra
             amount: parseFloat(formData.amount),
             type: formData.type,
             category: formData.type === 'expense' ? formData.category : undefined,
-            active: formData.active
+            active: true
         });
         onClose();
     };
@@ -174,18 +174,6 @@ export default function RecurringTransactionModal({ isOpen, onClose, onSave, tra
                                         </button>
                                     ))}
                                 </div>
-                            </div>
-
-                            <div className="flex items-center pt-2">
-                                <input
-                                    type="checkbox"
-                                    checked={formData.active}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, active: e.target.checked }))}
-                                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 focus:ring-offset-0 focus:outline-none"
-                                />
-                                <label className="ml-2 text-sm text-gray-600">
-                                    Active
-                                </label>
                             </div>
                         </div>
 

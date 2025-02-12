@@ -13,6 +13,8 @@ export type Income = {
   amount: number;
   date: string;
   created_at: string;
+  is_recurring?: boolean;
+  recurring_id?: string;
 };
 
 export type Expense = {
@@ -23,6 +25,8 @@ export type Expense = {
   amount: number;
   date: string;
   created_at: string;
+  is_recurring: boolean;
+  recurring_id?: string;
 };
 
 // Database helper functions
@@ -55,6 +59,31 @@ export const db = {
 
       if (error) throw error;
       return data;
+    },
+
+    async update(id: string, income: Partial<Omit<Income, 'id' | 'created_at' | 'user_id'>>) {
+      console.log('Attempting to update income with id:', id);
+      console.log('Update data:', income);
+
+      const { data, error } = await supabase
+        .from('income_sources')
+        .update(income)
+        .eq('id', id)
+        .select();
+
+      console.log('Supabase response - data:', data);
+      console.log('Supabase response - error:', error);
+
+      if (error) {
+        console.error('Error updating income:', error);
+        throw error;
+      }
+      if (!data || data.length === 0) {
+        console.error('No income found with id:', id);
+        throw new Error('Income source not found');
+      }
+      console.log('Successfully updated income:', data[0]);
+      return data[0];
     },
 
     async remove(id: string) {
@@ -96,6 +125,24 @@ export const db = {
 
       if (error) throw error;
       return data;
+    },
+
+    async update(id: string, expense: Partial<Omit<Expense, 'id' | 'created_at' | 'user_id'>>) {
+      const { data, error } = await supabase
+        .from('expenses')
+        .update({
+          name: expense.name,
+          amount: expense.amount,
+          category: expense.category,
+          is_recurring: expense.is_recurring,
+          recurring_id: expense.recurring_id
+        })
+        .eq('id', id)
+        .select();
+
+      if (error) throw error;
+      if (!data || data.length === 0) throw new Error('Expense not found');
+      return data[0];
     },
 
     async remove(id: string) {
