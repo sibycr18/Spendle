@@ -75,7 +75,7 @@ const Header = () => {
                                 }
                             >
                                 <Repeat className="h-4 w-4" />
-                                <span>Recurring Expenses</span>
+                                <span>Recurring</span>
                             </NavLink>
                             <NavLink
                                 to="/analytics"

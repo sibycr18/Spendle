@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { Category, Income, Expense, MonthData } from '../types';
-import { Trash2, IndianRupee, X, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Trash2, IndianRupee, X, Calendar, ChevronLeft, ChevronRight, ArrowDownCircle } from 'lucide-react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/datepicker.css";
@@ -518,24 +518,24 @@ export default function Dashboard() {
                                     Total: ₹{expensesByCategory[category].toFixed(2)}
                                 </span>
                             </div>
-                            <div className="space-y-2">
+                            <div className="bg-white rounded-lg shadow-sm border border-gray-200 divide-y divide-gray-200">
                                 {expenses
                                     .filter((expense) => expense.category === category)
                                     .map((expense) => (
                                         <div
                                             key={expense.id}
-                                            className="flex items-center justify-between bg-white py-2 px-3 rounded-md shadow-sm border border-gray-200"
+                                            className="flex items-center justify-between px-4 py-3 hover:bg-gray-50"
                                         >
-                                            <span className="font-medium text-gray-900">
+                                            <span className="text-sm font-medium text-gray-900">
                                                 {expense.name}
                                             </span>
-                                            <div className="flex items-center gap-3">
-                                                <span className="text-gray-900 font-medium">
+                                            <div className="flex items-center space-x-3">
+                                                <span className="text-sm font-semibold text-gray-600">
                                                     ₹{expense.amount.toFixed(2)}
                                                 </span>
                                                 <button
                                                     onClick={() => handleDeleteExpense(expense.id)}
-                                                    className="text-red-600 hover:text-red-800"
+                                                    className="p-1 text-gray-400 hover:text-red-500"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
                                                 </button>
@@ -543,7 +543,7 @@ export default function Dashboard() {
                                         </div>
                                     ))}
                                 {expenses.filter((expense) => expense.category === category).length === 0 && (
-                                    <div className="text-center py-2 text-gray-500">
+                                    <div className="px-4 py-3 text-center text-gray-500">
                                         No expenses here
                                     </div>
                                 )}

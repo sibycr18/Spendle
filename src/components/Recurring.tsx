@@ -128,157 +128,166 @@ export default function Recurring() {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 max-w-7xl mx-auto px-4 py-4">
             {/* Header Section */}
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col items-center text-center gap-2">
                 <h1 className="text-2xl font-bold text-gray-900">Monthly Recurring Transactions</h1>
-                <button
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    onClick={handleAddTransaction}
-                >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add New
-                </button>
+                <p className="text-sm text-gray-600">
+                    Set up your recurring transactions to automatically add them to your monthly income and expenses
+                </p>
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Monthly Recurring Income */}
-                <div className="bg-white rounded-lg shadow p-6 space-y-2">
-                    <div className="flex items-center space-x-2 text-green-600">
-                        <ArrowUpCircle className="h-5 w-5" />
-                        <h2 className="text-sm font-medium">Monthly Recurring Income</h2>
+            <div className="max-w-4xl mx-auto w-full">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {/* Monthly Recurring Income */}
+                    <div className="bg-white rounded-lg shadow-md border border-green-200 px-4 py-3 space-y-1">
+                        <div className="flex items-center space-x-2 text-green-600">
+                            <ArrowUpCircle className="h-4 w-4" />
+                            <h2 className="text-xs font-medium">Monthly Recurring Income</h2>
+                        </div>
+                        <p className="text-xl font-bold text-gray-900">
+                            ₹{summaryData.monthlyIncome.toLocaleString()}
+                        </p>
                     </div>
-                    <p className="text-2xl font-bold text-gray-900">
-                        ₹{summaryData.monthlyIncome.toLocaleString()}
-                    </p>
-                </div>
 
-                {/* Monthly Recurring Expenses */}
-                <div className="bg-white rounded-lg shadow p-6 space-y-2">
-                    <div className="flex items-center space-x-2 text-red-600">
-                        <ArrowDownCircle className="h-5 w-5" />
-                        <h2 className="text-sm font-medium">Monthly Recurring Expenses</h2>
+                    {/* Monthly Recurring Expenses */}
+                    <div className="bg-white rounded-lg shadow-md border border-red-200 px-4 py-3 space-y-1">
+                        <div className="flex items-center space-x-2 text-red-600">
+                            <ArrowDownCircle className="h-4 w-4" />
+                            <h2 className="text-xs font-medium">Monthly Recurring Expenses</h2>
+                        </div>
+                        <p className="text-xl font-bold text-gray-900">
+                            ₹{summaryData.monthlyExpenses.toLocaleString()}
+                        </p>
                     </div>
-                    <p className="text-2xl font-bold text-gray-900">
-                        ₹{summaryData.monthlyExpenses.toLocaleString()}
-                    </p>
-                </div>
 
-                {/* Net Monthly Recurring */}
-                <div className="bg-white rounded-lg shadow p-6 space-y-2">
-                    <div className="flex items-center space-x-2 text-blue-600">
-                        <Wallet className="h-5 w-5" />
-                        <h2 className="text-sm font-medium">Net Monthly Recurring</h2>
+                    {/* Net Monthly Recurring */}
+                    <div className="bg-white rounded-lg shadow-md border border-blue-200 px-4 py-3 space-y-1">
+                        <div className="flex items-center space-x-2 text-blue-600">
+                            <Wallet className="h-4 w-4" />
+                            <h2 className="text-xs font-medium">Net Monthly Recurring</h2>
+                        </div>
+                        <p className="text-xl font-bold text-gray-900">
+                            ₹{(summaryData.monthlyIncome - summaryData.monthlyExpenses).toLocaleString()}
+                        </p>
                     </div>
-                    <p className="text-2xl font-bold text-gray-900">
-                        ₹{(summaryData.monthlyIncome - summaryData.monthlyExpenses).toLocaleString()}
-                    </p>
                 </div>
             </div>
 
             {/* Tabs Section */}
-            <div className="border-b border-gray-200">
-                <nav className="-mb-px flex space-x-8">
-                    {['all', 'income', 'expenses'].map((tab) => (
+            <div className="max-w-2xl mx-auto w-full space-y-4">
+                <div className="border-b border-gray-200">
+                    <div className="flex justify-between items-center">
+                        <nav className="-mb-px flex space-x-8">
+                            {['all', 'income', 'expenses'].map((tab) => (
+                                <button
+                                    key={tab}
+                                    onClick={() => setActiveTab(tab as typeof activeTab)}
+                                    className={`
+                                        whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
+                                        ${activeTab === tab
+                                            ? 'border-blue-500 text-blue-600'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                        }
+                                    `}
+                                >
+                                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                                </button>
+                            ))}
+                        </nav>
                         <button
-                            key={tab}
-                            onClick={() => setActiveTab(tab as typeof activeTab)}
-                            className={`
-                                whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
-                                ${activeTab === tab
-                                    ? 'border-blue-500 text-blue-600'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                }
-                            `}
+                            className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            onClick={handleAddTransaction}
                         >
-                            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                            <Plus className="h-3.5 w-3.5 mr-1.5" />
+                            Add New
                         </button>
-                    ))}
-                </nav>
-            </div>
+                    </div>
+                </div>
 
-            {/* Transaction List */}
-            <div className="bg-white rounded-lg shadow divide-y divide-gray-200">
-                {isLoading ? (
-                    <div className="p-6">
-                        <p className="text-gray-500 text-center">Loading...</p>
-                    </div>
-                ) : filteredTransactions.length === 0 ? (
-                    <div className="p-6">
-                        <p className="text-gray-500 text-center">No recurring transactions yet.</p>
-                        <p className="text-gray-500 text-center mt-1">Set up your first recurring transaction to automate your finances.</p>
-                        <div className="mt-4 flex justify-center">
-                            <button
-                                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                onClick={handleAddTransaction}
-                            >
-                                <Plus className="h-4 w-4 mr-2" />
-                                Add Transaction
-                            </button>
+                {/* Transaction List */}
+                <div className="bg-white rounded-lg shadow-md border border-gray-300 divide-y divide-gray-200">
+                    {isLoading ? (
+                        <div className="p-4">
+                            <p className="text-gray-500 text-center">Loading...</p>
                         </div>
-                    </div>
-                ) : (
-                    filteredTransactions.map((transaction) => (
-                        <div key={transaction.id} className="p-6 hover:bg-gray-50">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-3">
-                                    <div className={`${
-                                        transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-                                    }`}>
-                                        {transaction.type === 'income' ? 
-                                            <ArrowUpCircle className="h-5 w-5" /> : 
-                                            <ArrowDownCircle className="h-5 w-5" />
-                                        }
-                                    </div>
-                                    <div>
-                                        <h3 className="text-sm font-medium text-gray-900">{transaction.name}</h3>
-                                        <div className="flex items-center space-x-2 mt-0.5">
-                                            <span className="text-sm text-gray-500">
-                                                ₹{transaction.amount.toLocaleString()}
-                                            </span>
-                                            {transaction.category && (
-                                                <>
-                                                    <span className="text-gray-300">•</span>
-                                                    <span className={`text-sm ${getCategoryColor(transaction.category)}`}>
-                                                        {transaction.category.charAt(0).toUpperCase() + transaction.category.slice(1)}
-                                                    </span>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <button
-                                        onClick={() => handleEdit(transaction.id)}
-                                        className="p-1 text-gray-400 hover:text-gray-500"
-                                    >
-                                        <Edit2 className="h-4 w-4" />
-                                    </button>
-                                    <button
-                                        onClick={() => handleToggleActive(transaction.id)}
-                                        className={`p-1 ${
-                                            transaction.active 
-                                                ? 'text-green-400 hover:text-green-500' 
-                                                : 'text-gray-400 hover:text-gray-500'
-                                        }`}
-                                    >
-                                        {transaction.active ? 
-                                            <Pause className="h-4 w-4" /> : 
-                                            <Play className="h-4 w-4" />
-                                        }
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(transaction.id)}
-                                        className="p-1 text-gray-400 hover:text-red-500"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </button>
-                                </div>
+                    ) : filteredTransactions.length === 0 ? (
+                        <div className="p-4">
+                            <p className="text-gray-500 text-center">No recurring transactions yet.</p>
+                            <p className="text-gray-500 text-center mt-1">Set up your first recurring transaction to automate your finances.</p>
+                            <div className="mt-4 flex justify-center">
+                                <button
+                                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                    onClick={handleAddTransaction}
+                                >
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Add Transaction
+                                </button>
                             </div>
                         </div>
-                    ))
-                )}
+                    ) : (
+                        filteredTransactions.map((transaction) => (
+                            <div key={transaction.id} className="px-4 py-3 hover:bg-gray-50">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-2">
+                                        <div className={`${
+                                            transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+                                        }`}>
+                                            {transaction.type === 'income' ? 
+                                                <ArrowUpCircle className="h-4 w-4" /> : 
+                                                <ArrowDownCircle className="h-4 w-4" />
+                                            }
+                                        </div>
+                                        <div>
+                                            <h3 className="text-sm font-medium text-gray-900">{transaction.name}</h3>
+                                            <div className="flex items-center space-x-2 mt-0.5">
+                                                <span className="text-sm text-gray-500">
+                                                    ₹{transaction.amount.toLocaleString()}
+                                                </span>
+                                                {transaction.category && (
+                                                    <>
+                                                        <span className="text-gray-300">•</span>
+                                                        <span className={`text-sm ${getCategoryColor(transaction.category)}`}>
+                                                            {transaction.category.charAt(0).toUpperCase() + transaction.category.slice(1)}
+                                                        </span>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <button
+                                            onClick={() => handleEdit(transaction.id)}
+                                            className="p-1 text-slate-400 hover:text-slate-600"
+                                        >
+                                            <Edit2 className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleToggleActive(transaction.id)}
+                                            className={`p-1 ${
+                                                transaction.active 
+                                                    ? 'text-green-500 hover:text-green-600' 
+                                                    : 'text-blue-500 hover:text-blue-600'
+                                            }`}
+                                        >
+                                            {transaction.active ? 
+                                                <Pause className="h-4 w-4" /> : 
+                                                <Play className="h-4 w-4" />
+                                            }
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(transaction.id)}
+                                            className="p-1 text-red-400 hover:text-red-600"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
             </div>
 
             {/* Add/Edit Modal */}
