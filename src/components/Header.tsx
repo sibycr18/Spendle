@@ -78,19 +78,6 @@ const Header = () => {
                 <span>Recurring</span>
             </NavLink>
             <NavLink
-                to="/analytics"
-                className={({ isActive }) =>
-                    `flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium ${
-                        isActive
-                            ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-                            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'
-                    }`
-                }
-            >
-                <BarChart3 className="h-4 w-4" />
-                <span>Analytics</span>
-            </NavLink>
-            <NavLink
                 to="/goals"
                 className={({ isActive }) =>
                     `flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium ${
@@ -102,6 +89,19 @@ const Header = () => {
             >
                 <Target className="h-4 w-4" />
                 <span>Goals</span>
+            </NavLink>
+            <NavLink
+                to="/analytics"
+                className={({ isActive }) =>
+                    `flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium ${
+                        isActive
+                            ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'
+                    }`
+                }
+            >
+                <BarChart3 className="h-4 w-4" />
+                <span>Analytics</span>
             </NavLink>
         </>
     );

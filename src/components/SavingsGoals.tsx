@@ -156,6 +156,91 @@ export default function SavingsGoals() {
         fetchGoals();
     }, [user]);
 
+    // Add this new function to check recurring status
+    const checkRecurringStatus = async (goalId: string) => {
+        setRecurringStates(prev => ({
+            ...prev,
+            [goalId]: { ...prev[goalId], isLoading: true }
+        }));
+
+        try {
+            const { data: recurringTransactions } = await supabase
+                .from('recurring_transactions')
+                .select('id, active')
+                .eq('goal_id', goalId)
+                .eq('type', 'expense')
+                .single();
+
+            setRecurringStates(prev => ({
+                ...prev,
+                [goalId]: {
+                    hasRecurring: !!recurringTransactions,
+                    isActive: recurringTransactions?.active ?? false,
+                    recurringId: recurringTransactions?.id,
+                    isLoading: false
+                }
+            }));
+        } catch (error) {
+            console.error('Error checking recurring status:', error);
+            setRecurringStates(prev => ({
+                ...prev,
+                [goalId]: {
+                    hasRecurring: false,
+                    isActive: false,
+                    isLoading: false
+                }
+            }));
+        }
+    };
+
+    // Add this to check recurring status when goals are loaded
+    useEffect(() => {
+        goals.forEach(goal => {
+            checkRecurringStatus(goal.id);
+        });
+    }, [goals]);
+
+    const handleRecurringToggle = async (goalId: string) => {
+        const state = recurringStates[goalId];
+        if (!state?.hasRecurring || !state.recurringId) return;
+
+        setRecurringStates(prev => ({
+            ...prev,
+            [goalId]: { ...prev[goalId], isLoading: true }
+        }));
+
+        try {
+            const { data: updatedTx, error } = await supabase
+                .from('recurring_transactions')
+                .update({ active: !state.isActive })
+                .eq('id', state.recurringId)
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            setRecurringStates(prev => ({
+                ...prev,
+                [goalId]: { 
+                    ...prev[goalId], 
+                    isActive: updatedTx.active, 
+                    isLoading: false 
+                }
+            }));
+
+            toast.success(state.isActive 
+                ? 'Recurring contribution paused' 
+                : 'Recurring contribution resumed');
+        } catch (error) {
+            console.error('Error toggling recurring status:', error);
+            toast.error('Failed to update recurring status');
+            setRecurringStates(prev => ({
+                ...prev,
+                [goalId]: { ...prev[goalId], isLoading: false }
+            }));
+        }
+    };
+
     const fetchGoals = async () => {
         if (!user) return;
         setIsLoading(true);
@@ -561,6 +646,12 @@ export default function SavingsGoals() {
                                 />
                                 <label htmlFor="recurring" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                                     Contribute {formatIndianNumber(parseFloat(newGoal.monthly_contribution) || 1000)} every month?
+                                    <span className="inline-flex items-center ml-1 group relative">
+                                        <Info size={14} className="text-gray-400 dark:text-gray-500" />
+                                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 text-xs text-center text-white bg-gray-900 dark:bg-gray-800 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                                            This amount will be added as a monthly recurring expense
+                                        </span>
+                                    </span>
                                 </label>
                             </div>
 
@@ -689,7 +780,7 @@ export default function SavingsGoals() {
                                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{goal.name}</h3>
                                     <p className="text-sm text-gray-600 dark:text-gray-400">
                                         {calculateEstimatedDate(goal.target_amount, goal.monthly_contribution, goal.current_amount)
-                                            ? `Estimated to complete by ${format(calculateEstimatedDate(goal.target_amount, goal.monthly_contribution, goal.current_amount)!, 'MMMM yyyy')}`
+                                            ? `Estimated achievement by: ${format(calculateEstimatedDate(goal.target_amount, goal.monthly_contribution, goal.current_amount)!, 'MMMM yyyy')}`
                                             : 'Set monthly contribution'}
                                     </p>
                                 </div>
