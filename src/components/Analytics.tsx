@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, subMonths, startOfYear, endOfYear } from 'date-fns';
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { db } from '../lib/supabase';
 import {
     Chart as ChartJS,
@@ -48,6 +49,7 @@ type YearlyData = {
 
 export default function Analytics() {
     const { user } = useAuth();
+    const { isDarkMode } = useTheme();
     const [isLoading, setIsLoading] = useState(false);
     const [selectedMonth, setSelectedMonth] = useState(startOfMonth(new Date()));
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -56,6 +58,12 @@ export default function Analytics() {
     const [monthlyPeriod, setMonthlyPeriod] = useState(12);
     const [yearlyPeriod, setYearlyPeriod] = useState(5);
     const [chartType, setChartType] = useState<'monthly' | 'yearly'>('monthly');
+    const [chartKey, setChartKey] = useState(0);
+
+    // Add effect to update chart when theme changes
+    useEffect(() => {
+        setChartKey(prev => prev + 1);
+    }, [isDarkMode]);
 
     const goToPreviousMonth = () => {
         setSelectedMonth(subMonths(selectedMonth, 1));
@@ -242,16 +250,16 @@ export default function Analytics() {
                 position: 'top' as const,
                 display: window.innerWidth > 640, // Hide legend on mobile
                 labels: {
-                    color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151',
+                    color: isDarkMode ? '#e5e7eb' : '#374151',
                 }
             },
             tooltip: {
                 mode: 'index',
                 intersect: false,
-                backgroundColor: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
-                titleColor: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151',
-                bodyColor: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151',
-                borderColor: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb',
+                backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                titleColor: isDarkMode ? '#e5e7eb' : '#374151',
+                bodyColor: isDarkMode ? '#e5e7eb' : '#374151',
+                borderColor: isDarkMode ? '#374151' : '#e5e7eb',
                 borderWidth: 1,
             },
         },
@@ -263,20 +271,20 @@ export default function Analytics() {
                         return `₹${value.toLocaleString('en-IN')}`;
                     },
                     maxTicksLimit: window.innerWidth < 640 ? 5 : 8, // Fewer ticks on mobile
-                    color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151',
+                    color: isDarkMode ? '#e5e7eb' : '#374151',
                 },
                 grid: {
-                    color: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb',
+                    color: isDarkMode ? '#374151' : '#e5e7eb',
                 }
             },
             x: {
                 ticks: {
                     maxRotation: window.innerWidth < 640 ? 45 : 0, // Rotate labels on mobile
                     minRotation: window.innerWidth < 640 ? 45 : 0,
-                    color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151',
+                    color: isDarkMode ? '#e5e7eb' : '#374151',
                 },
                 grid: {
-                    color: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb',
+                    color: isDarkMode ? '#374151' : '#e5e7eb',
                 }
             },
         },
@@ -289,16 +297,16 @@ export default function Analytics() {
             legend: {
                 position: 'top' as const,
                 labels: {
-                    color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151',
+                    color: isDarkMode ? '#e5e7eb' : '#374151',
                 }
             },
             tooltip: {
                 mode: 'index',
                 intersect: false,
-                backgroundColor: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
-                titleColor: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151',
-                bodyColor: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151',
-                borderColor: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb',
+                backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                titleColor: isDarkMode ? '#e5e7eb' : '#374151',
+                bodyColor: isDarkMode ? '#e5e7eb' : '#374151',
+                borderColor: isDarkMode ? '#374151' : '#e5e7eb',
                 borderWidth: 1,
                 callbacks: {
                     title: (context) => `Year ${context[0].label}`,
@@ -311,23 +319,23 @@ export default function Analytics() {
                 title: {
                     display: true,
                     text: 'Year',
-                    color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151',
+                    color: isDarkMode ? '#e5e7eb' : '#374151',
                 },
                 ticks: {
-                    color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151',
+                    color: isDarkMode ? '#e5e7eb' : '#374151',
                 },
                 grid: {
-                    color: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb',
+                    color: isDarkMode ? '#374151' : '#e5e7eb',
                 }
             },
             y: {
                 beginAtZero: true,
                 ticks: {
                     callback: (value) => `₹${value.toLocaleString()}`,
-                    color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151',
+                    color: isDarkMode ? '#e5e7eb' : '#374151',
                 },
                 grid: {
-                    color: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb',
+                    color: isDarkMode ? '#374151' : '#e5e7eb',
                 }
             },
         },
@@ -404,8 +412,9 @@ export default function Analytics() {
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-300 dark:border-gray-700 p-4 sm:p-6">
                 <div className="h-[300px] sm:h-[400px] md:h-[500px]">
                     <Line
+                        key={chartKey}
                         data={chartType === 'monthly' ? monthlyChartData : yearlyChartData}
-                        options={chartOptions}
+                        options={chartType === 'monthly' ? chartOptions : yearlyChartOptions}
                     />
                 </div>
             </div>
