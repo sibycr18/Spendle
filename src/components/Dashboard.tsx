@@ -243,7 +243,7 @@ export default function Dashboard() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white text-center sm:text-left">Dashboard</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-200 text-center sm:text-left">Dashboard</h1>
                     <p className="text-sm text-gray-600 dark:text-gray-400 text-center sm:text-left">
                         Track your income and expenses
                     </p>
@@ -308,11 +308,11 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 [&>*]:h-fit">
                 {/* Summary Section */}
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-300 dark:border-gray-700 p-4 sm:p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Summary</h2>
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-3">Summary</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div className="bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm border border-blue-200 dark:border-blue-900">
                             <div className="text-xs font-medium text-blue-600 dark:text-blue-400">Total Income</div>
-                            <div className="text-base sm:text-lg font-bold text-black dark:text-white">
+                            <div className="text-base sm:text-lg font-bold text-black dark:text-gray-200">
                                 {formatIndianNumber(totalIncome)}
                             </div>
                             <div className={`text-xs font-medium ${calculateTrend(totalIncome, prevTotalIncome) > 0 ? 'text-green-600 dark:text-green-400' : calculateTrend(totalIncome, prevTotalIncome) < 0 ? 'text-red-600 dark:text-red-400' : 'text-black dark:text-white'}`}>
@@ -321,7 +321,7 @@ export default function Dashboard() {
                         </div>
                         <div className="bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm border border-red-200 dark:border-red-900">
                             <div className="text-xs font-medium text-red-600 dark:text-red-400">Total Expenses</div>
-                            <div className="text-base sm:text-lg font-bold text-black dark:text-white">
+                            <div className="text-base sm:text-lg font-bold text-black dark:text-gray-200">
                                 {formatIndianNumber(totalExpenses)}
                             </div>
                             <div className={`text-xs font-medium ${calculateTrend(totalExpenses, prevTotalExpenses) > 0 ? 'text-red-600 dark:text-red-400' : calculateTrend(totalExpenses, prevTotalExpenses) < 0 ? 'text-green-600 dark:text-green-400' : 'text-black dark:text-white'}`}>
@@ -332,7 +332,7 @@ export default function Dashboard() {
                             <div className="text-xs font-medium text-green-600 dark:text-green-400">
                                 Remaining Balance
                             </div>
-                            <div className="text-base sm:text-lg font-bold text-black dark:text-white">
+                            <div className="text-base sm:text-lg font-bold text-black dark:text-gray-200">
                                 {formatIndianNumber(totalIncome - totalExpenses)}
                             </div>
                             <div className={`text-xs font-medium ${calculateTrend(totalIncome - totalExpenses, prevTotalIncome - prevTotalExpenses) > 0 ? 'text-green-600 dark:text-green-400' : calculateTrend(totalIncome - totalExpenses, prevTotalIncome - prevTotalExpenses) < 0 ? 'text-red-600 dark:text-red-400' : 'text-black dark:text-white'}`}>
@@ -343,10 +343,10 @@ export default function Dashboard() {
                             <div className="text-xs font-medium text-purple-600 dark:text-purple-400">
                                 Largest Spend
                             </div>
-                            <div className="text-base sm:text-lg font-bold text-black dark:text-white">
+                            <div className="text-base sm:text-lg font-bold text-black dark:text-gray-200">
                                 {getLargestExpenseCategory(expensesByCategory).category}
                             </div>
-                            <div className="text-xs font-medium text-black dark:text-white">
+                            <div className="text-xs font-medium text-black dark:text-gray-200">
                                 {formatIndianNumber(getLargestExpenseCategory(expensesByCategory).amount)}
                             </div>
                             <div className="text-xs font-medium text-gray-600 dark:text-gray-400">
@@ -361,7 +361,7 @@ export default function Dashboard() {
                 {/* Income Sources */}
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-300 dark:border-gray-700 p-4 sm:p-6">
                     <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0 mb-4">
-                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Income Sources</h2>
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200">Income Sources</h2>
                         <button
                             onClick={() => setIsIncomeModalOpen(true)}
                             className="w-full sm:w-auto px-3 py-1.5 bg-blue-600 dark:bg-blue-500 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 shadow-sm text-sm"
@@ -384,9 +384,9 @@ export default function Dashboard() {
                                         key={source.id}
                                         className="flex items-center justify-between px-3 sm:px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50"
                                     >
-                                        <span className="text-sm font-semibold text-gray-900 dark:text-white">{source.name}</span>
+                                        <span className="text-sm font-semibold text-gray-900 dark:text-gray-200">{source.name}</span>
                                         <div className="flex items-center space-x-3">
-                                            <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                            <span className="text-sm font-medium text-gray-900 dark:text-gray-200">
                                                 {formatIndianNumber(source.amount)}
                                             </span>
                                             <button
@@ -421,7 +421,7 @@ export default function Dashboard() {
             {/* Expenses */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-300 dark:border-gray-700 p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0 mb-4">
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Expenses</h2>
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200">Expenses</h2>
                     <button
                         onClick={() => setIsExpenseModalOpen(true)}
                         className="w-full sm:w-auto px-3 py-1.5 bg-blue-600 dark:bg-blue-500 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 shadow-sm text-sm"
@@ -451,11 +451,11 @@ export default function Dashboard() {
                                             key={expense.id}
                                             className="flex items-center justify-between px-3 sm:px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50"
                                         >
-                                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                                            <span className="text-sm font-semibold text-gray-900 dark:text-gray-200">
                                                 {expense.name}
                                             </span>
                                             <div className="flex items-center space-x-3">
-                                                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                                <span className="text-sm font-medium text-gray-900 dark:text-gray-200">
                                                     {formatIndianNumber(expense.amount)}
                                                 </span>
                                                 <button

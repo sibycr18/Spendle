@@ -113,7 +113,7 @@ const Header = () => {
                     <div className="flex items-center">
                         <Link to="/" className="flex items-center">
                             <Wallet className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                            <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">Spendle</span>
+                            <span className="ml-2 text-xl font-bold text-gray-900 dark:text-gray-200">Spendle</span>
                         </Link>
                         <nav className="hidden md:flex ml-8 space-x-4">
                             <NavLinks />
@@ -160,7 +160,7 @@ const Header = () => {
                                     />
                                 ) : (
                                     <div className="h-10 w-10 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center shadow-md ring-1 ring-blue-600 dark:ring-blue-400 ring-offset-2 ring-offset-white dark:ring-offset-gray-900 hover:ring-2 hover:ring-blue-500 dark:hover:ring-blue-300 transition-all duration-200">
-                                        <span className="text-white font-medium text-base">
+                                        <span className="text-gray-200 font-medium text-base">
                                             {user.name ? user.name[0].toUpperCase() : user.email?.[0].toUpperCase()}
                                         </span>
                                     </div>
@@ -171,7 +171,7 @@ const Header = () => {
                                 <div className="absolute right-0 mt-2 w-64 rounded-lg shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 dark:ring-white dark:ring-opacity-10 z-50">
                                     <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
                                         <p className="text-sm text-gray-500 dark:text-gray-400">Signed in as</p>
-                                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate mt-1">
+                                        <p className="text-sm font-medium text-gray-900 dark:text-gray-200 truncate mt-1">
                                             {user.name}
                                         </p>
                                         <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">

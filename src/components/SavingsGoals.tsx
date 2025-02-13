@@ -77,7 +77,7 @@ function DeleteConfirmationModal({ isOpen, onClose, goal, onConfirm }: DeleteCon
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full overflow-hidden">
                     <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 dark:border-gray-700">
-                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200">
                             Delete Goal
                         </h2>
                         <button
@@ -299,7 +299,7 @@ function GoalAnalyticsModal({ isOpen, onClose, goal }: GoalAnalyticsModalProps) 
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-4xl w-full overflow-hidden">
                     <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 dark:border-gray-700">
                         <div>
-                            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200">
                                 {goal.name} - Analytics
                             </h2>
                             <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -326,11 +326,11 @@ function GoalAnalyticsModal({ isOpen, onClose, goal }: GoalAnalyticsModalProps) 
                                     <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
                                         <div className="flex items-center gap-2 mb-2">
                                             <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                                            <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+                                            <h3 className="text-sm font-medium text-gray-900 dark:text-gray-200">
                                                 Progress
                                             </h3>
                                         </div>
-                                        <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                                        <p className="text-2xl font-semibold text-gray-900 dark:text-gray-200">
                                             {((goal.current_amount / goal.target_amount) * 100).toFixed(1)}%
                                         </p>
                                         <div className="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -344,11 +344,11 @@ function GoalAnalyticsModal({ isOpen, onClose, goal }: GoalAnalyticsModalProps) 
                                     <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
                                         <div className="flex items-center gap-2 mb-2">
                                             <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                                            <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+                                            <h3 className="text-sm font-medium text-gray-900 dark:text-gray-200">
                                                 Time Remaining
                                             </h3>
                                         </div>
-                                        <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                                        <p className="text-2xl font-semibold text-gray-900 dark:text-gray-200">
                                             {calculateTimeRemaining(
                                                 goal.target_amount,
                                                 stats.averageMonthlyContribution || goal.monthly_contribution,
@@ -360,11 +360,11 @@ function GoalAnalyticsModal({ isOpen, onClose, goal }: GoalAnalyticsModalProps) 
                                     <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
                                         <div className="flex items-center gap-2 mb-2">
                                             <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                                            <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+                                            <h3 className="text-sm font-medium text-gray-900 dark:text-gray-200">
                                                 Consistency Score
                                             </h3>
                                         </div>
-                                        <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                                        <p className="text-2xl font-semibold text-gray-900 dark:text-gray-200">
                                             {stats.consistencyScore.toFixed(1)}%
                                         </p>
                                         <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -376,7 +376,7 @@ function GoalAnalyticsModal({ isOpen, onClose, goal }: GoalAnalyticsModalProps) 
                                 {/* Monthly Contributions Chart */}
                                 <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
                                     <div className="flex items-center justify-between mb-4">
-                                        <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+                                        <h3 className="text-sm font-medium text-gray-900 dark:text-gray-200">
                                             Monthly Contributions
                                         </h3>
                                     </div>
@@ -387,7 +387,7 @@ function GoalAnalyticsModal({ isOpen, onClose, goal }: GoalAnalyticsModalProps) 
 
                                 {/* Recent Activity */}
                                 <div>
-                                    <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">
+                                    <h3 className="text-sm font-medium text-gray-900 dark:text-gray-200 mb-4">
                                         Recent Contributions
                                     </h3>
                                     <div className="space-y-4">
@@ -403,7 +403,7 @@ function GoalAnalyticsModal({ isOpen, onClose, goal }: GoalAnalyticsModalProps) 
                                                         <ArrowUp className="h-5 w-5 text-green-600 dark:text-green-400" />
                                                     )}
                                                     <div>
-                                                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                                        <p className="text-sm font-medium text-gray-900 dark:text-gray-200">
                                                             {expense.name}
                                                         </p>
                                                         <p className="text-xs text-gray-600 dark:text-gray-400">
@@ -411,7 +411,7 @@ function GoalAnalyticsModal({ isOpen, onClose, goal }: GoalAnalyticsModalProps) 
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                                <p className="text-sm font-medium text-gray-900 dark:text-gray-200">
                                                     {formatIndianNumber(expense.amount)}
                                                 </p>
                                             </div>
@@ -787,7 +787,7 @@ export default function SavingsGoals() {
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full overflow-hidden my-auto">
                     <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 dark:border-gray-700">
-                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Add New Goal</h2>
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200">Add New Goal</h2>
                         <button
                             onClick={() => setIsAddingGoal(false)}
                             className="text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400 transition-colors"
@@ -901,7 +901,7 @@ export default function SavingsGoals() {
                                                 <div className="space-y-1">
                                                     <div className="flex items-center gap-1.5">
                                                         <Info size={16} className="text-blue-600 dark:text-blue-400" />
-                                                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                                        <p className="text-sm font-medium text-gray-900 dark:text-gray-200">
                                                             Goal Completion
                                                         </p>
                                                     </div>
@@ -1015,7 +1015,7 @@ export default function SavingsGoals() {
 
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white text-center sm:text-left">Savings Goals</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-200 text-center sm:text-left">Savings Goals</h1>
                     <p className="text-sm text-gray-600 dark:text-gray-400 text-center sm:text-left">
                         Track and achieve your financial goals
                     </p>
@@ -1065,7 +1065,7 @@ export default function SavingsGoals() {
                     <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-full mb-4">
                         <Target className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-2">
                         No savings goals yet
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 max-w-md">
@@ -1089,7 +1089,7 @@ export default function SavingsGoals() {
                         >
                             <div className="flex justify-between items-start mb-4">
                                 <div>
-                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{goal.name}</h3>
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">{goal.name}</h3>
                                     <p className="text-sm text-gray-600 dark:text-gray-400">
                                         {calculateEstimatedDate(goal.target_amount, goal.monthly_contribution, goal.current_amount)
                                             ? `Estimated achievement by: ${format(calculateEstimatedDate(goal.target_amount, goal.monthly_contribution, goal.current_amount)!, 'MMMM yyyy')}`
@@ -1118,7 +1118,7 @@ export default function SavingsGoals() {
                                 <div>
                                     <div className="flex justify-between text-sm mb-1">
                                         <span className="text-gray-600 dark:text-gray-400">Progress</span>
-                                        <span className="text-gray-900 dark:text-white">{formatIndianNumber(goal.current_amount)} / {formatIndianNumber(goal.target_amount)}</span>
+                                        <span className="text-gray-900 dark:text-gray-200">{formatIndianNumber(goal.current_amount)} / {formatIndianNumber(goal.target_amount)}</span>
                                     </div>
                                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                                         <div
