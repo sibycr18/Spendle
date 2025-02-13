@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format, differenceInMonths, addMonths, startOfMonth, subMonths } from 'date-fns';
-import { Target, Plus, Trash2, TrendingUp, AlertCircle, X, PlusCircle, Info, Wallet, Play, Pause, Loader2, Calendar, ArrowUp, ArrowDown, Clock, Repeat, BarChart2, History } from 'lucide-react';
+import { Target, Plus, Trash2, TrendingUp, AlertCircle, X, PlusCircle, Info, Wallet, Play, Pause, Loader2, Calendar, ArrowUp, ArrowDown, Clock, Repeat } from 'lucide-react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { toast } from 'react-hot-toast';
@@ -247,7 +247,10 @@ function GoalAnalyticsModal({ isOpen, onClose, goal }: GoalAnalyticsModalProps) 
         maintainAspectRatio: false,
         plugins: {
             legend: {
-                display: false
+                position: 'top' as const,
+                labels: {
+                    color: 'rgb(156, 163, 175)' // gray-400
+                }
             },
             tooltip: {
                 mode: 'index',
@@ -269,13 +272,10 @@ function GoalAnalyticsModal({ isOpen, onClose, goal }: GoalAnalyticsModalProps) 
         scales: {
             x: {
                 grid: {
-                    display: false
+                    color: 'rgba(156, 163, 175, 0.1)' // gray-400 with opacity
                 },
                 ticks: {
-                    color: 'rgb(156, 163, 175)', // gray-400
-                    font: {
-                        size: 10
-                    }
+                    color: 'rgb(156, 163, 175)' // gray-400
                 }
             },
             y: {
@@ -284,10 +284,7 @@ function GoalAnalyticsModal({ isOpen, onClose, goal }: GoalAnalyticsModalProps) 
                 },
                 ticks: {
                     color: 'rgb(156, 163, 175)', // gray-400
-                    callback: (value) => formatIndianNumber(value as number),
-                    font: {
-                        size: 10
-                    }
+                    callback: (value) => formatIndianNumber(value as number)
                 }
             }
         }
@@ -299,13 +296,13 @@ function GoalAnalyticsModal({ isOpen, onClose, goal }: GoalAnalyticsModalProps) 
         <>
             <div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-50" />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-2xl w-full overflow-hidden">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-4xl w-full overflow-hidden">
                     <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 dark:border-gray-700">
                         <div>
-                            <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+                            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                                 {goal.name} - Analytics
                             </h2>
-                            <p className="text-xs text-gray-600 dark:text-gray-400">
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
                                 Track your progress and contribution patterns
                             </p>
                         </div>
@@ -313,41 +310,45 @@ function GoalAnalyticsModal({ isOpen, onClose, goal }: GoalAnalyticsModalProps) 
                             onClick={onClose}
                             className="text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400 transition-colors"
                         >
-                            <X className="h-4 w-4" />
+                            <X className="h-5 w-5" />
                         </button>
                     </div>
 
                     <div className="p-6 overflow-y-auto max-h-[calc(100vh-8rem)]">
                         {isLoading ? (
-                            <div className="flex items-center justify-center py-6">
-                                <Loader2 className="h-5 w-5 animate-spin text-blue-600 dark:text-blue-400" />
+                            <div className="flex items-center justify-center py-12">
+                                <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-400" />
                             </div>
                         ) : (
-                            <div className="space-y-5">
+                            <div className="space-y-8">
                                 {/* Progress Overview */}
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-300 dark:border-gray-700 p-4">
-                                        <div className="flex items-center space-x-2 text-blue-600 dark:text-blue-400">
-                                            <TrendingUp className="h-4 w-4" />
-                                            <h2 className="text-xs font-medium">Progress</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                                            <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+                                                Progress
+                                            </h3>
                                         </div>
-                                        <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-50 mt-1">
+                                        <p className="text-2xl font-semibold text-gray-900 dark:text-white">
                                             {((goal.current_amount / goal.target_amount) * 100).toFixed(1)}%
                                         </p>
-                                        <div className="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                                        <div className="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                                             <div
-                                                className="bg-blue-600 dark:bg-blue-500 h-1.5 rounded-full transition-all duration-300"
+                                                className="bg-blue-600 dark:bg-blue-500 h-2 rounded-full transition-all duration-300"
                                                 style={{ width: `${Math.min((goal.current_amount / goal.target_amount) * 100, 100)}%` }}
                                             />
                                         </div>
                                     </div>
 
-                                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-300 dark:border-gray-700 p-4">
-                                        <div className="flex items-center space-x-2 text-blue-600 dark:text-blue-400">
-                                            <Calendar className="h-4 w-4" />
-                                            <h2 className="text-xs font-medium">Time Remaining</h2>
+                                    <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                                            <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+                                                Time Remaining
+                                            </h3>
                                         </div>
-                                        <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-50 mt-1">
+                                        <p className="text-2xl font-semibold text-gray-900 dark:text-white">
                                             {calculateTimeRemaining(
                                                 goal.target_amount,
                                                 stats.averageMonthlyContribution || goal.monthly_contribution,
@@ -356,55 +357,65 @@ function GoalAnalyticsModal({ isOpen, onClose, goal }: GoalAnalyticsModalProps) 
                                         </p>
                                     </div>
 
-                                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-300 dark:border-gray-700 p-4">
-                                        <div className="flex items-center space-x-2 text-blue-600 dark:text-blue-400">
-                                            <Clock className="h-4 w-4" />
-                                            <h2 className="text-xs font-medium">Consistency Score</h2>
+                                    <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                                            <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+                                                Consistency Score
+                                            </h3>
                                         </div>
-                                        <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-50 mt-1">
+                                        <p className="text-2xl font-semibold text-gray-900 dark:text-white">
                                             {stats.consistencyScore.toFixed(1)}%
                                         </p>
-                                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">
                                             {stats.numContributions} contributions made
                                         </p>
                                     </div>
                                 </div>
 
                                 {/* Monthly Contributions Chart */}
-                                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-300 dark:border-gray-700 p-4">
-                                    <div className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 mb-4">
-                                        <BarChart2 className="h-4 w-4" />
-                                        <h2 className="text-xs font-medium">Monthly Contributions</h2>
+                                <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+                                            Monthly Contributions
+                                        </h3>
                                     </div>
-                                    <div className="h-48">
+                                    <div className="h-64">
                                         <Line data={chartData} options={chartOptions} />
                                     </div>
                                 </div>
 
-                                {/* Recent Contributions */}
-                                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-300 dark:border-gray-700 p-4">
-                                    <div className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 mb-4">
-                                        <History className="h-4 w-4" />
-                                        <h2 className="text-xs font-medium">Recent Contributions</h2>
-                                    </div>
-                                    <div className="space-y-3">
-                                        {expenses.length === 0 ? (
-                                            <p className="text-sm text-gray-600 dark:text-gray-400">No contributions yet</p>
-                                        ) : (
-                                            expenses.map((expense) => (
-                                                <div key={expense.id} className="flex items-center justify-between">
-                                                    <div className="flex items-center space-x-3">
-                                                        <div className="h-2 w-2 rounded-full bg-blue-600 dark:bg-blue-400" />
-                                                        <span className="text-sm font-medium text-gray-900 dark:text-gray-50">
-                                                            ₹{expense.amount.toLocaleString()}
-                                                        </span>
+                                {/* Recent Activity */}
+                                <div>
+                                    <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">
+                                        Recent Contributions
+                                    </h3>
+                                    <div className="space-y-4">
+                                        {expenses.slice(0, 5).map(expense => (
+                                            <div
+                                                key={expense.id}
+                                                className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-xl"
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    {expense.is_recurring ? (
+                                                        <Repeat className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                                                    ) : (
+                                                        <ArrowUp className="h-5 w-5 text-green-600 dark:text-green-400" />
+                                                    )}
+                                                    <div>
+                                                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                                            {expense.name}
+                                                        </p>
+                                                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                                                            {format(new Date(expense.date), 'MMM d, yyyy')}
+                                                        </p>
                                                     </div>
-                                                    <span className="text-xs text-gray-600 dark:text-gray-400">
-                                                        {format(new Date(expense.date), 'MMM d, yyyy')}
-                                                    </span>
                                                 </div>
-                                            ))
-                                        )}
+                                                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                                    {formatIndianNumber(expense.amount)}
+                                                </p>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
@@ -1004,7 +1015,7 @@ export default function SavingsGoals() {
 
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50 text-center sm:text-left">Savings Goals</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white text-center sm:text-left">Savings Goals</h1>
                     <p className="text-sm text-gray-600 dark:text-gray-400 text-center sm:text-left">
                         Track and achieve your financial goals
                     </p>

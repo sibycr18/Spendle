@@ -74,7 +74,7 @@ export default function RecurringTransactionModal({ isOpen, onClose, onSave, tra
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full overflow-hidden">
                     <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 dark:border-gray-700">
-                        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                             {transaction ? 'Edit' : 'Add'} Monthly {formData.type === 'income' ? 'Income' : 'Expense'}
                         </h2>
                         <button
@@ -126,7 +126,7 @@ export default function RecurringTransactionModal({ isOpen, onClose, onSave, tra
                                     type="text"
                                     value={formData.name}
                                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                                    className="block w-full rounded-lg border-0 px-3 py-2.5 text-gray-900 dark:text-gray-50 bg-white dark:bg-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-500 focus:outline-none sm:text-sm sm:leading-6"
+                                    className="block w-full rounded-lg border-0 px-3 py-2.5 text-gray-900 dark:text-white bg-white dark:bg-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-500 focus:outline-none sm:text-sm sm:leading-6"
                                     placeholder="e.g. Rent, Salary"
                                     required
                                 />
@@ -142,7 +142,7 @@ export default function RecurringTransactionModal({ isOpen, onClose, onSave, tra
                                         type="number"
                                         value={formData.amount}
                                         onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
-                                        className="block w-full rounded-lg border-0 py-2.5 pl-7 pr-12 text-gray-900 dark:text-gray-50 bg-white dark:bg-gray-900 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-500 focus:outline-none sm:text-sm sm:leading-6"
+                                        className="block w-full rounded-lg border-0 py-2.5 pl-7 pr-12 text-gray-900 dark:text-white bg-white dark:bg-gray-900 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-500 focus:outline-none sm:text-sm sm:leading-6"
                                         placeholder="0.00"
                                         required
                                         min="0"

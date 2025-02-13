@@ -145,7 +145,7 @@ export default function Recurring() {
             <div className="flex-1 space-y-6 max-w-7xl mx-auto px-4 sm:px-6 py-4">
                 {/* Header Section */}
                 <div className="flex flex-col items-center text-center gap-2">
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Monthly Recurring Transactions</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Monthly Recurring Transactions</h1>
                     <p className="text-sm text-gray-600 dark:text-gray-400 px-4">
                         Set up your recurring transactions to automatically add them to your monthly income and expenses
                     </p>
@@ -160,7 +160,7 @@ export default function Recurring() {
                                 <ArrowUpCircle className="h-4 w-4" />
                                 <h2 className="text-xs font-medium">Monthly Recurring Income</h2>
                             </div>
-                            <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-50">
+                            <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                                 ₹{summaryData.monthlyIncome.toLocaleString()}
                             </p>
                         </div>
@@ -171,7 +171,7 @@ export default function Recurring() {
                                 <ArrowDownCircle className="h-4 w-4" />
                                 <h2 className="text-xs font-medium">Monthly Recurring Expenses</h2>
                             </div>
-                            <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-50">
+                            <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                                 ₹{summaryData.monthlyExpenses.toLocaleString()}
                             </p>
                         </div>
@@ -182,7 +182,7 @@ export default function Recurring() {
                                 <Wallet className="h-4 w-4" />
                                 <h2 className="text-xs font-medium">Net Monthly Recurring</h2>
                             </div>
-                            <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-50">
+                            <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                                 ₹{(summaryData.monthlyIncome - summaryData.monthlyExpenses).toLocaleString()}
                             </p>
                         </div>
@@ -255,7 +255,7 @@ export default function Recurring() {
                                                 )}
                                             </div>
                                             <div>
-                                                <h3 className="text-sm font-medium text-gray-900 dark:text-gray-50">{transaction.name}</h3>
+                                                <h3 className="text-sm font-medium text-gray-900 dark:text-white">{transaction.name}</h3>
                                                 {transaction.type === 'expense' && transaction.category && (
                                                     <p className={`text-xs ${getCategoryColor(transaction.category)} flex items-center gap-1`}>
                                                         <Circle className="h-1.5 w-1.5 fill-current opacity-75" />
@@ -265,7 +265,7 @@ export default function Recurring() {
                                             </div>
                                         </div>
                                         <div className="flex items-center justify-between sm:justify-end gap-4">
-                                            <span className="text-sm font-medium text-gray-900 dark:text-gray-50">
+                                            <span className="text-sm font-medium text-gray-900 dark:text-white">
                                                 ₹{transaction.amount.toLocaleString()}
                                             </span>
                                             <div className="flex items-center space-x-2">

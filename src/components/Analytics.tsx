@@ -365,7 +365,7 @@ export default function Analytics() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50 text-center sm:text-left">Analytics</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white text-center sm:text-left">Analytics</h1>
                     <p className="text-sm text-gray-600 dark:text-gray-400 text-center sm:text-left">
                         Track your spending patterns
                     </p>
@@ -410,7 +410,7 @@ export default function Analytics() {
 
             {/* Chart */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-300 dark:border-gray-700 p-4 sm:p-6">
-                <div className="h-[200px] sm:h-[250px] md:h-[300px]">
+                <div className="h-[300px] sm:h-[400px] md:h-[500px]">
                     <Line
                         key={chartKey}
                         data={chartType === 'monthly' ? monthlyChartData : yearlyChartData}
