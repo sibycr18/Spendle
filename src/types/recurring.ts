@@ -9,6 +9,7 @@ export interface RecurringTransaction {
     category?: Category;
     active: boolean;
     created_at: string;
+    goal_id?: string;
 }
 
 export interface CreateRecurringTransaction {

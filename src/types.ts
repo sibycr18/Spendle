@@ -32,6 +32,7 @@ export interface RecurringTransaction {
     type: 'income' | 'expense';
     category?: Category; // Optional because income doesn't have category
     active: boolean;
+    goal_id?: string; // Optional because not all recurring transactions are linked to goals
 }
 
 export interface MonthData {

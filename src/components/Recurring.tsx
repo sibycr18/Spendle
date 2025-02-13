@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Plus, ArrowUpCircle, ArrowDownCircle, Wallet, Edit2, Pause, Play, Trash2, Circle } from 'lucide-react';
+import { Plus, ArrowUpCircle, ArrowDownCircle, Wallet, Edit2, Pause, Play, Trash2, Circle, Info, Target } from 'lucide-react';
 import { RecurringTransaction, Category } from '../types';
 import RecurringTransactionModal from './RecurringTransactionModal';
 import { 
@@ -14,7 +14,7 @@ import { toast } from 'react-hot-toast';
 
 export default function Recurring() {
     const { user } = useAuth();
-    const [activeTab, setActiveTab] = useState<'all' | 'income' | 'expenses'>('all');
+    const [activeTab, setActiveTab] = useState<'all' | 'income' | 'expenses' | 'goals'>('all');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTransaction, setEditingTransaction] = useState<RecurringTransaction | undefined>();
     const [transactions, setTransactions] = useState<RecurringTransaction[]>([]);
@@ -48,8 +48,9 @@ export default function Recurring() {
 
     const filteredTransactions = transactions.filter(transaction => {
         if (activeTab === 'all') return true;
-        if (activeTab === 'expenses') return transaction.type === 'expense';
+        if (activeTab === 'expenses') return transaction.type === 'expense' && !transaction.goal_id;
         if (activeTab === 'income') return transaction.type === 'income';
+        if (activeTab === 'goals') return !!transaction.goal_id;
         return false;
     });
 
@@ -153,37 +154,26 @@ export default function Recurring() {
 
                 {/* Summary Cards */}
                 <div className="max-w-4xl mx-auto w-full">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {/* Monthly Recurring Income */}
-                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-green-200 dark:border-green-900 px-4 py-3 space-y-1">
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-green-200 dark:border-green-900 px-4 py-3 flex flex-col items-center">
                             <div className="flex items-center space-x-2 text-green-600 dark:text-green-400">
                                 <ArrowUpCircle className="h-4 w-4" />
                                 <h2 className="text-xs font-medium">Monthly Recurring Income</h2>
                             </div>
-                            <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-200">
+                            <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-200 mt-1">
                                 ₹{summaryData.monthlyIncome.toLocaleString()}
                             </p>
                         </div>
 
                         {/* Monthly Recurring Expenses */}
-                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-red-200 dark:border-red-900 px-4 py-3 space-y-1">
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-red-200 dark:border-red-900 px-4 py-3 flex flex-col items-center">
                             <div className="flex items-center space-x-2 text-red-600 dark:text-red-400">
                                 <ArrowDownCircle className="h-4 w-4" />
                                 <h2 className="text-xs font-medium">Monthly Recurring Expenses</h2>
                             </div>
-                            <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-200">
+                            <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-200 mt-1">
                                 ₹{summaryData.monthlyExpenses.toLocaleString()}
-                            </p>
-                        </div>
-
-                        {/* Net Monthly Recurring */}
-                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-blue-200 dark:border-blue-900 px-4 py-3 space-y-1 sm:col-span-2 md:col-span-1">
-                            <div className="flex items-center space-x-2 text-blue-600 dark:text-blue-400">
-                                <Wallet className="h-4 w-4" />
-                                <h2 className="text-xs font-medium">Net Monthly Recurring</h2>
-                            </div>
-                            <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-200">
-                                ₹{(summaryData.monthlyIncome - summaryData.monthlyExpenses).toLocaleString()}
                             </p>
                         </div>
                     </div>
@@ -194,7 +184,7 @@ export default function Recurring() {
                     <div className="border-b border-gray-200 dark:border-gray-700">
                         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
                             <nav className="-mb-px flex space-x-4 sm:space-x-8 overflow-x-auto w-full sm:w-auto pb-4 sm:pb-0">
-                                {['all', 'income', 'expenses'].map((tab) => (
+                                {['all', 'income', 'expenses', 'goals'].map((tab) => (
                                     <button
                                         key={tab}
                                         onClick={() => setActiveTab(tab as typeof activeTab)}
@@ -241,61 +231,80 @@ export default function Recurring() {
                                 </div>
                             </div>
                         ) : (
-                            filteredTransactions.map((transaction) => (
-                                <div key={transaction.id} className="px-3 sm:px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
-                                        <div className="flex items-center space-x-2">
-                                            <div className={`${
-                                                transaction.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                                            }`}>
-                                                {transaction.type === 'income' ? (
-                                                    <ArrowUpCircle className="h-4 w-4" />
-                                                ) : (
-                                                    <ArrowDownCircle className="h-4 w-4" />
-                                                )}
-                                            </div>
-                                            <div>
-                                                <h3 className="text-sm font-medium text-gray-900 dark:text-gray-200">{transaction.name}</h3>
-                                                {transaction.type === 'expense' && transaction.category && (
-                                                    <p className={`text-xs ${getCategoryColor(transaction.category)} flex items-center gap-1`}>
-                                                        <Circle className="h-1.5 w-1.5 fill-current opacity-75" />
-                                                        {transaction.category.charAt(0).toUpperCase() + transaction.category.slice(1)}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center justify-between sm:justify-end gap-4">
-                                            <span className="text-sm font-medium text-gray-900 dark:text-gray-200">
-                                                ₹{transaction.amount.toLocaleString()}
-                                            </span>
+                            <>
+                                {filteredTransactions.map((transaction) => (
+                                    <div key={transaction.id} className="px-3 sm:px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
                                             <div className="flex items-center space-x-2">
-                                                <button
-                                                    onClick={() => handleEdit(transaction.id)}
-                                                    className="p-1 text-gray-400 hover:text-blue-500 dark:text-gray-500 dark:hover:text-blue-400"
-                                                >
-                                                    <Edit2 className="h-4 w-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleToggleActive(transaction.id)}
-                                                    className={`p-1 ${transaction.active ? 'text-green-500 hover:text-yellow-500 dark:text-green-400 dark:hover:text-yellow-400' : 'text-yellow-500 hover:text-green-500 dark:text-yellow-400 dark:hover:text-green-400'}`}
-                                                >
-                                                    {transaction.active ? (
-                                                        <Pause className="h-4 w-4" />
+                                                <div className={`${
+                                                    transaction.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                                                }`}>
+                                                    {transaction.type === 'income' ? (
+                                                        <ArrowUpCircle className="h-4 w-4" />
                                                     ) : (
-                                                        <Play className="h-4 w-4" />
+                                                        <ArrowDownCircle className="h-4 w-4" />
                                                     )}
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(transaction.id)}
-                                                    className="p-1 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </button>
+                                                </div>
+                                                <div>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <h3 className="text-sm font-medium text-gray-900 dark:text-gray-200">{transaction.name}</h3>
+                                                        {transaction.goal_id && (
+                                                            <Target className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" />
+                                                        )}
+                                                    </div>
+                                                    {transaction.type === 'expense' && transaction.category && (
+                                                        <p className={`text-xs ${getCategoryColor(transaction.category)} flex items-center gap-1`}>
+                                                            <Circle className="h-1.5 w-1.5 fill-current opacity-75" />
+                                                            {transaction.category.charAt(0).toUpperCase() + transaction.category.slice(1)}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center justify-between sm:justify-end gap-4">
+                                                <span className="text-sm font-medium text-gray-900 dark:text-gray-200">
+                                                    ₹{transaction.amount.toLocaleString()}
+                                                </span>
+                                                <div className="flex items-center space-x-2">
+                                                    <button
+                                                        onClick={() => handleEdit(transaction.id)}
+                                                        className="p-1 text-gray-400 hover:text-blue-500 dark:text-gray-500 dark:hover:text-blue-400"
+                                                    >
+                                                        <Edit2 className="h-4 w-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleToggleActive(transaction.id)}
+                                                        className={`p-1 ${transaction.active ? 'text-green-500 hover:text-yellow-500 dark:text-green-400 dark:hover:text-yellow-400' : 'text-yellow-500 hover:text-green-500 dark:text-yellow-400 dark:hover:text-green-400'}`}
+                                                    >
+                                                        {transaction.active ? (
+                                                            <Pause className="h-4 w-4" />
+                                                        ) : (
+                                                            <Play className="h-4 w-4" />
+                                                        )}
+                                                    </button>
+                                                    {transaction.goal_id ? (
+                                                        <button
+                                                            className="p-1 text-blue-500 dark:text-blue-400 group relative"
+                                                        >
+                                                            <Info className="h-4 w-4" />
+                                                            <div className="absolute bottom-full right-0 mb-2 w-48 px-2 py-1.5 bg-gray-900 dark:bg-gray-800 text-white dark:text-gray-200 text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                                                                Cannot delete recurring transactions linked to Goals
+                                                                <div className="absolute -bottom-1 right-1.5 border-4 border-transparent border-t-gray-900 dark:border-t-gray-800"></div>
+                                                            </div>
+                                                        </button>
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => handleDelete(transaction.id)}
+                                                            className="p-1 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))
+                                ))}
+                            </>
                         )}
                     </div>
                 </div>
