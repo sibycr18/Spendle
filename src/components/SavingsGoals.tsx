@@ -1,15 +1,39 @@
 import { useState, useEffect } from 'react';
-import { format, differenceInMonths, addMonths } from 'date-fns';
-import { Target, Plus, Trash2, TrendingUp, AlertCircle, X, PlusCircle, Info, Wallet, Play, Pause, Loader2 } from 'lucide-react';
+import { format, differenceInMonths, addMonths, startOfMonth, subMonths } from 'date-fns';
+import { Target, Plus, Trash2, TrendingUp, AlertCircle, X, PlusCircle, Info, Wallet, Play, Pause, Loader2, Calendar, ArrowUp, ArrowDown, Clock, Repeat, BarChart2, History } from 'lucide-react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/supabase';
-import { SavingsGoal, SavingsRecommendation, Category } from '../types';
+import { SavingsGoal, SavingsRecommendation, Category, Expense } from '../types';
 import { createPortal } from 'react-dom';
 import ContributionModal from './ContributionModal';
 import { supabase } from '../lib/supabase';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+    type ChartData,
+    type ChartOptions
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+
+// Register ChartJS components
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+);
 
 const CATEGORIES: Category[] = ['investment', 'debt', 'needs', 'leisure'];
 
@@ -133,6 +157,284 @@ interface GoalRecurringState {
     };
 }
 
+interface GoalAnalyticsModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    goal: SavingsGoal;
+}
+
+function GoalAnalyticsModal({ isOpen, onClose, goal }: GoalAnalyticsModalProps) {
+    const [expenses, setExpenses] = useState<Expense[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [monthlyData, setMonthlyData] = useState<{ month: Date; amount: number }[]>([]);
+    const [stats, setStats] = useState({
+        totalContributions: 0,
+        numContributions: 0,
+        consistencyScore: 0,
+        averageMonthlyContribution: 0
+    });
+
+    useEffect(() => {
+        const fetchExpenses = async () => {
+            setIsLoading(true);
+            try {
+                const startDate = subMonths(new Date(), 12); // Last 12 months
+                const { data: expensesData, error } = await supabase
+                    .from('expenses')
+                    .select('*')
+                    .eq('goal_id', goal.id)
+                    .gte('date', startDate.toISOString())
+                    .order('date', { ascending: true });
+
+                if (error) throw error;
+
+                setExpenses(expensesData);
+
+                // Calculate monthly data
+                const monthlyContributions = new Map<string, number>();
+                expensesData.forEach(expense => {
+                    const month = startOfMonth(new Date(expense.date));
+                    const key = month.toISOString();
+                    monthlyContributions.set(key, (monthlyContributions.get(key) || 0) + expense.amount);
+                });
+
+                const monthlyDataArray = Array.from(monthlyContributions.entries()).map(([date, amount]) => ({
+                    month: new Date(date),
+                    amount
+                }));
+
+                setMonthlyData(monthlyDataArray);
+
+                // Calculate statistics
+                const totalAmount = expensesData.reduce((sum, exp) => sum + exp.amount, 0);
+                const numMonths = differenceInMonths(new Date(), startDate);
+                const monthsWithContributions = monthlyContributions.size;
+
+                setStats({
+                    totalContributions: totalAmount,
+                    numContributions: expensesData.length,
+                    consistencyScore: (monthsWithContributions / numMonths) * 100,
+                    averageMonthlyContribution: totalAmount / numMonths
+                });
+            } catch (error) {
+                console.error('Error fetching expenses:', error);
+                toast.error('Failed to load goal analytics');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        if (isOpen) {
+            fetchExpenses();
+        }
+    }, [isOpen, goal.id]);
+
+    const chartData: ChartData<'line'> = {
+        labels: monthlyData.map(d => format(d.month, 'MMM yyyy')),
+        datasets: [
+            {
+                label: 'Monthly Contributions',
+                data: monthlyData.map(d => d.amount),
+                borderColor: 'rgb(59, 130, 246)', // blue
+                backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                tension: 0.4
+            }
+        ]
+    };
+
+    const chartOptions: ChartOptions<'line'> = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            },
+            tooltip: {
+                mode: 'index',
+                intersect: false,
+                callbacks: {
+                    label: (context) => {
+                        let label = context.dataset.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        if (context.parsed.y !== null) {
+                            label += formatIndianNumber(context.parsed.y);
+                        }
+                        return label;
+                    }
+                }
+            }
+        },
+        scales: {
+            x: {
+                grid: {
+                    display: false
+                },
+                ticks: {
+                    color: 'rgb(156, 163, 175)', // gray-400
+                    font: {
+                        size: 10
+                    }
+                }
+            },
+            y: {
+                grid: {
+                    color: 'rgba(156, 163, 175, 0.1)' // gray-400 with opacity
+                },
+                ticks: {
+                    color: 'rgb(156, 163, 175)', // gray-400
+                    callback: (value) => formatIndianNumber(value as number),
+                    font: {
+                        size: 10
+                    }
+                }
+            }
+        }
+    };
+
+    if (!isOpen) return null;
+
+    return createPortal(
+        <>
+            <div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-50" />
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-2xl w-full overflow-hidden">
+                    <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+                        <div>
+                            <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+                                {goal.name} - Analytics
+                            </h2>
+                            <p className="text-xs text-gray-600 dark:text-gray-400">
+                                Track your progress and contribution patterns
+                            </p>
+                        </div>
+                        <button
+                            onClick={onClose}
+                            className="text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400 transition-colors"
+                        >
+                            <X className="h-4 w-4" />
+                        </button>
+                    </div>
+
+                    <div className="p-6 overflow-y-auto max-h-[calc(100vh-8rem)]">
+                        {isLoading ? (
+                            <div className="flex items-center justify-center py-6">
+                                <Loader2 className="h-5 w-5 animate-spin text-blue-600 dark:text-blue-400" />
+                            </div>
+                        ) : (
+                            <div className="space-y-5">
+                                {/* Progress Overview */}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-300 dark:border-gray-700 p-4">
+                                        <div className="flex items-center space-x-2 text-blue-600 dark:text-blue-400">
+                                            <TrendingUp className="h-4 w-4" />
+                                            <h2 className="text-xs font-medium">Progress</h2>
+                                        </div>
+                                        <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-50 mt-1">
+                                            {((goal.current_amount / goal.target_amount) * 100).toFixed(1)}%
+                                        </p>
+                                        <div className="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                                            <div
+                                                className="bg-blue-600 dark:bg-blue-500 h-1.5 rounded-full transition-all duration-300"
+                                                style={{ width: `${Math.min((goal.current_amount / goal.target_amount) * 100, 100)}%` }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-300 dark:border-gray-700 p-4">
+                                        <div className="flex items-center space-x-2 text-blue-600 dark:text-blue-400">
+                                            <Calendar className="h-4 w-4" />
+                                            <h2 className="text-xs font-medium">Time Remaining</h2>
+                                        </div>
+                                        <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-50 mt-1">
+                                            {calculateTimeRemaining(
+                                                goal.target_amount,
+                                                stats.averageMonthlyContribution || goal.monthly_contribution,
+                                                goal.current_amount
+                                            )}
+                                        </p>
+                                    </div>
+
+                                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-300 dark:border-gray-700 p-4">
+                                        <div className="flex items-center space-x-2 text-blue-600 dark:text-blue-400">
+                                            <Clock className="h-4 w-4" />
+                                            <h2 className="text-xs font-medium">Consistency Score</h2>
+                                        </div>
+                                        <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-50 mt-1">
+                                            {stats.consistencyScore.toFixed(1)}%
+                                        </p>
+                                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+                                            {stats.numContributions} contributions made
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Monthly Contributions Chart */}
+                                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-300 dark:border-gray-700 p-4">
+                                    <div className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 mb-4">
+                                        <BarChart2 className="h-4 w-4" />
+                                        <h2 className="text-xs font-medium">Monthly Contributions</h2>
+                                    </div>
+                                    <div className="h-48">
+                                        <Line data={chartData} options={chartOptions} />
+                                    </div>
+                                </div>
+
+                                {/* Recent Contributions */}
+                                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-300 dark:border-gray-700 p-4">
+                                    <div className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 mb-4">
+                                        <History className="h-4 w-4" />
+                                        <h2 className="text-xs font-medium">Recent Contributions</h2>
+                                    </div>
+                                    <div className="space-y-3">
+                                        {expenses.length === 0 ? (
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">No contributions yet</p>
+                                        ) : (
+                                            expenses.map((expense) => (
+                                                <div key={expense.id} className="flex items-center justify-between">
+                                                    <div className="flex items-center space-x-3">
+                                                        <div className="h-2 w-2 rounded-full bg-blue-600 dark:bg-blue-400" />
+                                                        <span className="text-sm font-medium text-gray-900 dark:text-gray-50">
+                                                            ₹{expense.amount.toLocaleString()}
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-xs text-gray-600 dark:text-gray-400">
+                                                        {format(new Date(expense.date), 'MMM d, yyyy')}
+                                                    </span>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </>,
+        document.body
+    );
+}
+
+// Calculate time remaining function (add this before the GoalAnalyticsModal component)
+const calculateTimeRemaining = (targetAmount: number, monthlyContribution: number, currentAmount: number = 0) => {
+    if (monthlyContribution <= 0) return 'No monthly contribution set';
+    const remainingAmount = targetAmount - currentAmount;
+    const monthsNeeded = Math.ceil(remainingAmount / monthlyContribution);
+    const years = Math.floor(monthsNeeded / 12);
+    const months = monthsNeeded % 12;
+    
+    let timeString = '';
+    if (years > 0) {
+        timeString += `${years} year${years > 1 ? 's' : ''}`;
+        if (months > 0) timeString += ` and ${months} month${months > 1 ? 's' : ''}`;
+    } else {
+        timeString += `${months} month${months > 1 ? 's' : ''}`;
+    }
+    return timeString;
+};
+
 export default function SavingsGoals() {
     const { user } = useAuth();
     const [goals, setGoals] = useState<SavingsGoal[]>([]);
@@ -150,6 +452,7 @@ export default function SavingsGoals() {
     });
     const [goalToDelete, setGoalToDelete] = useState<SavingsGoal | null>(null);
     const [recurringStates, setRecurringStates] = useState<GoalRecurringState>({});
+    const [selectedGoalForAnalytics, setSelectedGoalForAnalytics] = useState<SavingsGoal | null>(null);
 
     useEffect(() => {
         if (!user) return;
@@ -286,24 +589,6 @@ export default function SavingsGoals() {
         const remainingAmount = targetAmount - currentAmount;
         const monthsNeeded = Math.ceil(remainingAmount / monthlyContribution);
         return addMonths(new Date(), monthsNeeded);
-    };
-
-    // Calculate time duration in months and years
-    const calculateTimeRemaining = (targetAmount: number, monthlyContribution: number, currentAmount: number = 0) => {
-        if (monthlyContribution <= 0) return null;
-        const remainingAmount = targetAmount - currentAmount;
-        const monthsNeeded = Math.ceil(remainingAmount / monthlyContribution);
-        const years = Math.floor(monthsNeeded / 12);
-        const months = monthsNeeded % 12;
-        
-        let timeString = '';
-        if (years > 0) {
-            timeString += `${years} year${years > 1 ? 's' : ''}`;
-            if (months > 0) timeString += ` and ${months} month${months > 1 ? 's' : ''}`;
-        } else {
-            timeString += `${months} month${months > 1 ? 's' : ''}`;
-        }
-        return timeString;
     };
 
     const handleAddGoal = async () => {
@@ -481,6 +766,10 @@ export default function SavingsGoals() {
         setGoalToDelete(goal);
     };
 
+    const handleGoalClick = (goal: SavingsGoal) => {
+        setSelectedGoalForAnalytics(goal);
+    };
+
     const modal = isAddingGoal && (
         <>
             <div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-50" />
@@ -648,7 +937,7 @@ export default function SavingsGoals() {
                                     Contribute {formatIndianNumber(parseFloat(newGoal.monthly_contribution) || 1000)} every month?
                                     <span className="inline-flex items-center ml-1 group relative">
                                         <Info size={14} className="text-gray-400 dark:text-gray-500" />
-                                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 text-xs text-center text-white bg-gray-900 dark:bg-gray-800 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 text-center text-white bg-gray-900 dark:bg-gray-800 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
                                             This amount will be added as a monthly recurring expense
                                         </span>
                                     </span>
@@ -715,7 +1004,7 @@ export default function SavingsGoals() {
 
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white text-center sm:text-left">Savings Goals</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50 text-center sm:text-left">Savings Goals</h1>
                     <p className="text-sm text-gray-600 dark:text-gray-400 text-center sm:text-left">
                         Track and achieve your financial goals
                     </p>
@@ -752,6 +1041,14 @@ export default function SavingsGoals() {
                 />
             )}
 
+            {selectedGoalForAnalytics && (
+                <GoalAnalyticsModal
+                    isOpen={true}
+                    onClose={() => setSelectedGoalForAnalytics(null)}
+                    goal={selectedGoalForAnalytics}
+                />
+            )}
+
             {!isLoading && goals.length === 0 ? (
                 <div className="flex flex-col items-center justify-center text-center py-12 px-4">
                     <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-full mb-4">
@@ -774,7 +1071,11 @@ export default function SavingsGoals() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {goals.map((goal) => (
-                        <div key={goal.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                        <div
+                            key={goal.id}
+                            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 cursor-pointer hover:shadow-xl transition-shadow duration-200"
+                            onClick={() => handleGoalClick(goal)}
+                        >
                             <div className="flex justify-between items-start mb-4">
                                 <div>
                                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{goal.name}</h3>

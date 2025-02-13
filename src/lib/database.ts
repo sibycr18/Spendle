@@ -5,6 +5,8 @@ export interface Expense {
     amount: number;
     category: Category;
     user_id: string;
+    date: string;
+    goal_id?: string;
     is_recurring?: boolean;
     recurring_id?: string;
 }

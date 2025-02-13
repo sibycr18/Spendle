@@ -172,7 +172,7 @@ export default function ContributionModal({ isOpen, onClose, goal }: Props) {
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full overflow-hidden">
                     <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 dark:border-gray-700">
-                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
                             Add Contribution to {goal.name}
                         </h2>
                         <button
@@ -196,7 +196,7 @@ export default function ContributionModal({ isOpen, onClose, goal }: Props) {
                                             type="number"
                                             value={amount}
                                             onChange={(e) => setAmount(e.target.value)}
-                                            className="block w-full rounded-lg border-0 py-2.5 pl-7 pr-12 text-gray-900 dark:text-white bg-white dark:bg-gray-900 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-500 focus:outline-none sm:text-sm sm:leading-6"
+                                            className="block w-full rounded-lg border-0 py-2.5 pl-7 pr-12 text-gray-900 dark:text-gray-50 bg-white dark:bg-gray-900 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-500 focus:outline-none sm:text-sm sm:leading-6"
                                             placeholder="0.00"
                                             required
                                             min="0"
@@ -250,7 +250,7 @@ export default function ContributionModal({ isOpen, onClose, goal }: Props) {
                                     <div className="space-y-1">
                                         <div className="flex items-center gap-1.5">
                                             <Info size={16} className="text-blue-600 dark:text-blue-400" />
-                                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                            <p className="text-sm font-medium text-gray-900 dark:text-gray-50">
                                                 Goal Completion
                                             </p>
                                         </div>
