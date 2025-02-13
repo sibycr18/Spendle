@@ -29,6 +29,41 @@ export type Expense = {
   recurring_id?: string;
 };
 
+export type SavingsGoal = {
+  id: string;
+  user_id: string;
+  name: string;
+  target_amount: number;
+  current_amount: number;
+  monthly_contribution: number;
+  category: string;
+  created_at: string;
+  status: 'active' | 'completed' | 'cancelled';
+};
+
+export type SavingsRecommendation = {
+  id: string;
+  user_id: string;
+  name: string;
+  amount: number;
+  date: string;
+  created_at: string;
+  status: 'pending' | 'accepted' | 'rejected';
+};
+
+export type RecurringTransaction = {
+  id: string;
+  user_id: string;
+  name: string;
+  amount: number;
+  type: 'income' | 'expense';
+  category?: string;
+  active: boolean;
+  goal_id?: string;
+  frequency: 'monthly';
+  created_at: string;
+};
+
 // Database helper functions
 export const db = {
   // Income functions
@@ -152,6 +187,110 @@ export const db = {
         .eq('id', id);
 
       if (error) throw error;
+    }
+  },
+
+  savingsGoals: {
+    async getAll(userId: string) {
+      const { data, error } = await supabase
+        .from('savings_goals')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+
+    async create(goal: Omit<SavingsGoal, 'id' | 'created_at'>) {
+      const { data, error } = await supabase
+        .from('savings_goals')
+        .insert([{ ...goal, created_at: new Date().toISOString() }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+
+    async update(id: string, updates: Partial<SavingsGoal>) {
+      const { data, error } = await supabase
+        .from('savings_goals')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+
+    async remove(id: string) {
+      const { error } = await supabase
+        .from('savings_goals')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+
+    async getExpensesTotal(goalId: string) {
+      const { data, error } = await supabase
+        .from('expenses')
+        .select('amount')
+        .eq('goal_id', goalId);
+
+      if (error) throw error;
+      return data.reduce((sum, expense) => sum + expense.amount, 0);
+    }
+  },
+
+  recurringTransactions: {
+    async getAll(userId: string) {
+      const { data, error } = await supabase
+        .from('recurring_transactions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+
+    async create(transaction: Omit<RecurringTransaction, 'id' | 'created_at'>) {
+      const { data, error } = await supabase
+        .from('recurring_transactions')
+        .insert([{ ...transaction, created_at: new Date().toISOString() }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+
+    async update(id: string, updates: Partial<Omit<RecurringTransaction, 'id' | 'created_at' | 'user_id'>>) {
+      const { data, error } = await supabase
+        .from('recurring_transactions')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+
+    async remove(id: string) {
+      const { error } = await supabase
+        .from('recurring_transactions')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+
+    async deactivate(id: string) {
+      return this.update(id, { active: false });
     }
   }
 };

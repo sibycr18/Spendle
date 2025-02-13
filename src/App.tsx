@@ -7,6 +7,7 @@ import Header from './components/Header';
 import SignIn from './components/SignIn';
 import { default as AnalyticsComponent } from './components/Analytics';
 import { default as RecurringComponent } from './components/Recurring';
+import { default as SavingsGoalsComponent } from './components/SavingsGoals';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 
@@ -34,6 +35,7 @@ function AppContent() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/analytics" element={<AnalyticsComponent />} />
             <Route path="/recurring" element={<RecurringComponent />} />
+            <Route path="/goals" element={<SavingsGoalsComponent />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

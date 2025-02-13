@@ -193,7 +193,8 @@ export async function processMonthlyRecurringTransactions() {
                     recurring_id: recurring.id,
                     user_id: user.id,
                     date: firstDayOfMonth.toISOString(),
-                    created_at: new Date().toISOString()
+                    created_at: new Date().toISOString(),
+                    goal_id: recurring.goal_id
                 }))
             );
 

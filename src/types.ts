@@ -17,6 +17,9 @@ export interface Expense {
     category: Category;
     date: string;
     created_at: string;
+    goal_id?: string;
+    is_recurring: boolean;
+    recurring_id?: string;
 }
 
 export type Frequency = 'daily' | 'weekly' | 'monthly' | 'yearly';
@@ -42,4 +45,26 @@ export interface User {
     email: string;
     name?: string;
     avatar_url?: string;
+}
+
+export interface SavingsGoal {
+    id: string;
+    user_id: string;
+    name: string;
+    target_amount: number;
+    current_amount: number;
+    monthly_contribution: number;
+    category: Category;
+    created_at: string;
+    status: 'active' | 'completed' | 'cancelled';
+}
+
+export interface SavingsRecommendation {
+    id: string;
+    goal_id: string;
+    type: 'spending_cut' | 'investment_opportunity' | 'saving_suggestion';
+    description: string;
+    potential_impact: number;
+    created_at: string;
+    status: 'pending' | 'accepted' | 'rejected';
 }
