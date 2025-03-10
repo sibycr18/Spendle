@@ -32,11 +32,12 @@ function AppContent() {
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/analytics" element={<AnalyticsComponent />} />
             <Route path="/recurring" element={<RecurringComponent />} />
             <Route path="/goals" element={<SavingsGoalsComponent />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </div>
       </main>

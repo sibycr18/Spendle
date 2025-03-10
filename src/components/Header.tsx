@@ -52,7 +52,7 @@ const Header = () => {
     const NavLinks = () => (
         <>
             <NavLink
-                to="/"
+                to="/dashboard"
                 className={({ isActive }) =>
                     `flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium ${
                         isActive
@@ -111,7 +111,7 @@ const Header = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                     <div className="flex items-center">
-                        <Link to="/" className="flex items-center">
+                        <Link to="/dashboard" className="flex items-center">
                             <Wallet className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                             <span className="ml-2 text-xl font-bold text-gray-900 dark:text-gray-200">Spendle</span>
                         </Link>
