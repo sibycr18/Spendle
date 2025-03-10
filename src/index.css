@@ -5,7 +5,13 @@
 @layer base {
   html, body {
     height: 100%;
-    overflow: hidden;
+  }
+
+  /* Allow scrolling for landing page */
+  .landing-page-layout {
+    overflow-y: auto;
+    height: auto;
+    min-height: 100vh;
   }
 
   input[type="number"]::-webkit-inner-spin-button,

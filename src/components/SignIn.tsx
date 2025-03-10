@@ -2,10 +2,16 @@ import React, { useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { supabase } from '../lib/supabase';
 import { Wallet } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import FloatingElements from './FloatingElements';
 
 export default function SignIn() {
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    // Get the intended destination from location state or default to dashboard
+    const from = location.state?.from?.pathname || '/dashboard';
 
     const handleGoogleSignIn = async (credentialResponse: any) => {
         setIsLoading(true);
@@ -22,6 +28,9 @@ export default function SignIn() {
             }
 
             console.log('Successfully signed in:', data);
+            
+            // Redirect to the intended destination after successful login
+            navigate(from, { replace: true });
         } catch (error) {
             console.error('Error signing in:', error);
             // TODO: Add proper error handling
