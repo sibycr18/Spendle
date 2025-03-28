@@ -1,9 +1,9 @@
-import { createClient } from '@supabase/supabase-js';
+// This file is kept for backward compatibility
+// It re-exports everything from the enhanced supabaseClient
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+import { supabase, supabaseAuth, isOffline } from './supabaseClient';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export { supabase, supabaseAuth, isOffline };
 
 // Types for our database tables
 export type Income = {

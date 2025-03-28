@@ -9,6 +9,7 @@ import { default as AnalyticsComponent } from './components/Analytics';
 import { default as RecurringComponent } from './components/Recurring';
 import { default as SavingsGoalsComponent } from './components/SavingsGoals';
 import LandingPage from './components/LandingPage';
+import NetworkStatus from './components/NetworkStatus';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 
@@ -113,6 +114,7 @@ function App() {
         <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
           <BrowserRouter>
             <AppContent />
+            <NetworkStatus />
             <Analytics />
           </BrowserRouter>
         </GoogleOAuthProvider>

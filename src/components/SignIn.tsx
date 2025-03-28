@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
-import { supabase } from '../lib/supabase';
+import { supabase, isOffline } from '../lib/supabase';
 import { Wallet } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import FloatingElements from './FloatingElements';
 
 export default function SignIn() {
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -15,7 +16,14 @@ export default function SignIn() {
 
     const handleGoogleSignIn = async (credentialResponse: any) => {
         setIsLoading(true);
+        setError(null);
+        
         try {
+            // Check if we're offline before attempting the sign-in
+            if (isOffline()) {
+                throw new Error('You appear to be offline. Please check your internet connection and try again.');
+            }
+            
             const { data, error } = await supabase.auth.signInWithIdToken({
                 provider: 'google',
                 token: credentialResponse.credential,
@@ -23,7 +31,7 @@ export default function SignIn() {
 
             if (error) {
                 console.error('Error signing in with Google:', error.message);
-                // TODO: Add proper error handling
+                setError(error.message);
                 return;
             }
 
@@ -31,9 +39,9 @@ export default function SignIn() {
             
             // Redirect to the intended destination after successful login
             navigate(from, { replace: true });
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error signing in:', error);
-            // TODO: Add proper error handling
+            setError(error.message || 'Failed to sign in. Please try again.');
         } finally {
             setIsLoading(false);
         }
@@ -61,11 +69,18 @@ export default function SignIn() {
                             <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
                                 <div className="w-full h-full bg-blue-600 animate-loading-bar"></div>
                             </div>
-                            <p className="text-base text-gray-600">Signing you in</p>
+                            <p className="text-gray-600">Signing in...</p>
                         </div>
                     </div>
                 </>
             )}
+
+            {error && (
+                <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-4 py-2 rounded-md shadow-lg">
+                    {error}
+                </div>
+            )}
+
             <FloatingElements />
             
             <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
